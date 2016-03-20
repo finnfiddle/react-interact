@@ -21,12 +21,18 @@ module.exports = {
 
   output: {
     filename: minify ? 'index.min.js' : 'index.js',
+    libraryTarget: 'umd',
     path: path.resolve('./build')
   },
 
-  externals: {
-    "react": "React",
-  },
+  externals: [{
+    react: {
+      root: 'React',
+      commonjs2: 'react',
+      commonjs: 'react',
+      amd: 'react'
+    }
+  }],
 
   plugins: [
     new webpack.DefinePlugin({
