@@ -45,6 +45,23 @@ gulp.task('jade', function(done){
     .pipe(jade({
       pretty: true,
       jade: j,
+      locals: {
+        uri_prefix: '',
+      }
+    }))
+    .pipe(gulp.dest(''))
+    .on('end', done);
+});
+
+gulp.task('jade:prod', function(done){
+  gulp
+    .src('source/jade/*.jade')
+    .pipe(jade({
+      pretty: true,
+      jade: j,
+      locals: {
+        uri_prefix: '/react-interact',
+      }
     }))
     .pipe(gulp.dest(''))
     .on('end', done);
@@ -69,4 +86,10 @@ gulp.task('default', [
   'jade',
   'connect',
   'watch',
+]);
+
+gulp.task('prod', [
+  // 'clean',
+  'less',
+  'jade:prod',
 ]);

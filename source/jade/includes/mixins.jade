@@ -6,16 +6,16 @@ mixin navbar
   nav.navbar.navbar-default
     .container-fluid
       .navbar-header
-        a.navbar-brand(href="/") Interact
+        a.navbar-brand(href=uri_prefix+"/") Interact
 
       ul.nav.navbar-nav.navbar-right
         li
-          a(href="/") Home
+          a(href=uri_prefix+"/") Home
         li
-          a(href="/guides.html") Guides
+          a(href=uri_prefix+"/guides.html") Guides
         li
-          a(href="/docs.html") Docs
+          a(href=uri_prefix+"/docs.html") Docs
         li
-          a(href="") Github
+          a(href=uri_prefix+"") Github
           
         
