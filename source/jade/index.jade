@@ -1,0 +1,76 @@
+extends ./includes/layout.jade
+
+block content      
+  .jumbotron
+    h1 Interact
+    p Declarative REST data fetching for React
+    a.btn.btn-lg.btn-primary(href="/guides.html") Get Started
+    
+  .row
+    .col-sm-4
+      h3 Declarative
+      p The days of communicating with your data store using an imperative API are over. Simply declare your data requirements and let Interact fetch your data when needed.
+      
+    .col-sm-4
+      h3 Colocation
+      p Queries live next to the views that rely on them, so you can easily reason about your app. No more complex state management systems.
+      
+    .col-sm-4
+      h3 REST
+      p Plug it in and start communicating immediately with your existing REST API. 
+      
+  .row
+    .col-xs-6
+      h2 Basic Example
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class MyComponent extends Component {
+
+              render() {
+                return <div>
+                  {this.props.dinosaurs.map(dinosaur => {
+                    return `${dinosaur.name}, `
+                  })}
+                </div>
+              },
+              
+            }
+
+            export default createContainer(MyComponent, () => ({
+              dinosaurs: '/api/v1/dinosaurs',
+            }))
+            
+    .col-xs-6
+      h2 &nbsp;
+      h4 Network request
+      pre 
+        code GET /api/v1/dinosaurs
+          
+      h4 Response
+      pre
+        code.
+          [
+            {id: 1, name: 'Triceratops'},
+            {id: 2, name: 'Tyrannosaurus'},
+            {id: 3, name: 'Giraffatitan'},
+          ]
+      
+      h4 Result
+      p Triceratops, Tyrannosaurus, Giraffatitan,
+      
+  +space
+  
+  .row
+    .col-xs-12.text-center
+      a.btn.btn-lg.btn-primary(href="/guides.html") Guides
+      | &nbsp;&nbsp;
+      a.btn.btn-lg.btn-primary(href="/docs.html") Docs
+      | &nbsp;&nbsp;
+      a.btn.btn-lg.btn-primary(href="") Github
+
+  +space
+  +space

@@ -1,0 +1,149 @@
+extends ./includes/layout.jade
+
+block content
+  
+  .row
+    .col-md-3
+      +space
+      ul
+        li
+          a Installation
+        li
+          a Conatiners
+          
+    .col-md-9
+      .page-header
+        h1 Configuring Containers
+        
+      p Containers need to be configured so that they know where and how to send network requests. The second argument to 
+        code Interact.createContainer()
+        | &nbsp;is a function that returns an object where each key-value pair corresponds to an API resource.
+      p Example:
+        
+      pre
+        code.javascript.
+          Interact.createContainer(WrappedComponent, () => ({
+            resourceName: {
+              base: '/api/v1/resourceName', // base uri for resource that gets 
+                                            // prepended to all operation uris
+              list: {method: 'GET', uri: '...'}, // method and uri for listing items
+              
+              read: {method: 'GET', uri: '...'}, // method and uri for reading an item
+              
+              create: {method: 'POST', uri: '...'}, // method and uri for creating an item
+              
+              update: {method: 'PUT', uri: '...'}, // method and uri for updating an item
+              
+              patch: {method: 'PATCH', uri: '...'}, // method and uri for patching an item
+              
+              remove: {method: 'DELETE', uri: '...'}, // method and uri for removing an item
+              
+              defaultOperation: 'list', // operation that is executed when component mounts
+              
+              uid: 'id', // unique identifier key for each item
+            },
+            ...
+          }))
+        
+      +space
+      h4 Defaults / URI shorthand
+      p Instead of using an object for each operation config (eg. read, list, update) we can choose to only write the URI string. The operations will use the default HTTP verbs for each. The above could have been written like this:
+        
+      pre
+        code.javascript.
+          Interact.createContainer(WrappedComponent, () => ({
+            resourceName: {
+              base: '/api/v1/resourceName',
+              list: '...',
+              read: '...',
+              create: '...',
+              update: '...',
+              patch: '...',
+              remove: '...',
+            },
+            ...
+          }))
+
+      +space    
+      h4 Dynamic URIs
+      p The function that returns the resources config object gets passed an object containing the props and other parameters for the request. Operation URIs can be made dynamic by using this passed-in data. 
+      p For example:
+
+      pre
+        code.javascript.
+          Interact.createContainer(WrappedComponent, ({props, id, payload}) => ({
+            resourceName: {
+              base: '/api/v1/resourceName',
+              list: '',
+              read: `/${id}`,
+              create: '',
+              update: `/${id}`,
+              patch: `/${id}`,
+              remove: `/${id}`,
+            },
+            ...
+          }))
+
+      +space    
+      h4 Item keys/URIs
+      p In the above example you'll notice that all operations for individual items (eg. update, remove, read, patch) have the same URI. In this case we can simplify our configuration even further by using an 
+        code item
+        | &nbsp;key to configure all of the item operations at the same time.
+      p For example:
+
+      pre
+        code.javascript.
+          Interact.createContainer(WrappedComponent, ({props, id, payload}) => ({
+            resourceName: {
+              base: '/api/v1/resourceName',
+              list: '',
+              item: `/${id}`,
+            },
+            ...
+          }))
+          
+          
+      .callout.callout-info 
+        h4 The 
+          code create
+          | &nbsp;operation uses the base URI by default and can be omitted.
+        
+      .callout.callout-warning 
+        h4 Only use the
+          code item
+          | &nbsp;key if you wish to use the default HTTP verbs for each operation.
+        
+      +space    
+      h4 Resource URIs
+      p The previous example can be simplified even further. We can define a resource by only using the base URI string. If we used the following configuration:
+       
+      pre
+        code.javascript.
+          Interact.createContainer(WrappedComponent, ({props, id, payload}) => ({
+            resourceName: '/api/v1/resourceName',
+            ...
+          }))
+          
+
+      p It would be equivalent to writing the following:
+
+      pre
+        code.javascript.
+          Interact.createContainer(WrappedComponent, ({props, id, payload}) => ({
+            resourceName: {
+              base: '/api/v1/resourceName',
+              list: {method: 'GET', uri: ''},
+              read: {method: 'GET', uri: `/${id}`},
+              create: {method: 'POST', uri: ''},
+              update: {method: 'PUT', uri: `/${id}`},
+              patch: {method: 'PATCH', uri: `/${id}`},
+              remove: {method: 'DELETE', uri: `/${id}`},
+              defaultOperation: 'list',
+              uid: 'id',
+            },
+            ...
+          }))
+          
+      +space    
+      +space    
+      +space    

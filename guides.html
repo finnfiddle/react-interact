@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Interact</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header"><a href="/" class="navbar-brand">Interact</a></div>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/">Home</a></li>
+          <li><a href="/guides.html">Guides</a></li>
+          <li><a href="/docs.html">Docs</a></li>
+          <li><a href="">Github</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3"><br/><br/>
+          <ul>
+            <li><a>Installation</a></li>
+            <li><a>Conatiners</a></li>
+          </ul>
+        </div>
+        <div class="col-md-9">
+          <div class="page-header">
+            <h1>Getting Started</h1>
+          </div>
+          <h2>Installation</h2>
+          <pre><code class="shell">npm install react-interact</code></pre><br/><br/>
+          <h2>Containers</h2>
+          <p>Containers are higher-order components that communicate with the backend to fetch and mutate data. They pass the data to the wrapped component as props. And they can be configured in various ways so that they know how and where to perform certain CRUD operations.</p>
+          <h3>Basic Example</h3>
+          <div class="row">
+            <div class="col-xs-12">
+              <pre><code class="javascript">import React, { Component } from 'react'
+import { createContainer } from 'react-interact'
+
+class MyComponent extends Component {
+
+  render() {
+    return &lt;div&gt;
+      {this.props.dinosaurs.map(dinosaur =&gt; {
+        return `${dinosaur.name}, `
+      })}
+    &lt;/div&gt;
+  },
+  
+}
+
+export default createContainer(MyComponent, () =&gt; ({
+  dinosaurs: '/api/v1/dinosaurs',
+}))
+</code></pre>
+              <h4>Network request</h4>
+              <pre><code>GET /api/v1/dinosaurs</code></pre>
+              <h4>Response</h4>
+              <pre><code>[
+  {id: 1, name: 'Triceratops'},
+  {id: 2, name: 'Tyrannosaurus'},
+  {id: 3, name: 'Giraffatitan'},
+]
+</code></pre>
+              <h4>Result</h4>
+              <p>Triceratops, Tyrannosaurus, Giraffatitan,</p>
+            </div>
+          </div><br/><br/><a href="/guides_containers.html" class="btn btn-lg btn-primary">Configuring Containers</a><br/><br/>
+          <h2>Mutations</h2><br/><br/><a href="/.html" class="btn btn-lg btn-primary">More About Mutations</a><br/><br/><br/><br/><br/><br/>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

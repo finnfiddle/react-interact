@@ -1,0 +1,26 @@
+{
+  "name": "react-interact-docs",
+  "version": "0.0.1",
+  "description": "github pages docs for react-interact",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finnfiddle/react-interact.git"
+  },
+  "author": "Finn Fitzsimons <finn@datamail.io> (http://datamail.io)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/finnfiddle/react-interact/issues"
+  },
+  "homepage": "https://github.com/finnfiddle/react-interact#readme",
+  "devDependencies": {
+    "express": "^4.13.4",
+    "gulp": "^3.9.1",
+    "gulp-jade": "^1.1.0",
+    "gulp-less": "^3.0.5",
+    "gulp-rename": "^1.2.2"
+  }
+}

@@ -1,0 +1,82 @@
+extends ./includes/layout.jade
+
+block navbar
+  +navbar
+  
+block content      
+  
+  .row
+    .col-md-3
+      +space
+      ul
+        li
+          a Installation
+        li
+          a Conatiners
+          
+    .col-md-9
+      .page-header
+        h1 Getting Started
+        
+      h2 Installation
+      pre
+        code.shell npm install react-interact
+        
+      +space
+      h2 Containers
+      p Containers are higher-order components that communicate with the backend to fetch and mutate data. They pass the data to the wrapped component as props. And they can be configured in various ways so that they know how and where to perform certain CRUD operations.
+      
+      h3 Basic Example
+      .row
+        .col-xs-12
+          pre
+            code.javascript
+              :escape
+                import React, { Component } from 'react'
+                import { createContainer } from 'react-interact'
+
+                class MyComponent extends Component {
+
+                  render() {
+                    return <div>
+                      {this.props.dinosaurs.map(dinosaur => {
+                        return `${dinosaur.name}, `
+                      })}
+                    </div>
+                  },
+                  
+                }
+
+                export default createContainer(MyComponent, () => ({
+                  dinosaurs: '/api/v1/dinosaurs',
+                }))
+                
+          h4 Network request
+          pre
+            code GET /api/v1/dinosaurs
+              
+          h4 Response
+          pre
+            code.
+              [
+                {id: 1, name: 'Triceratops'},
+                {id: 2, name: 'Tyrannosaurus'},
+                {id: 3, name: 'Giraffatitan'},
+              ]
+          
+          h4 Result
+          p Triceratops, Tyrannosaurus, Giraffatitan,
+          
+      +space
+      a.btn.btn-lg.btn-primary(href="/guides_containers.html") Configuring Containers
+      
+      +space
+      h2 Mutations
+      
+      +space
+      a.btn.btn-lg.btn-primary(href="/.html") More About Mutations
+      
+      +space
+      +space
+      +space
+      

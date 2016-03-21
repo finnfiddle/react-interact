@@ -1,6 +1,0 @@
-{
-  "name": "Interact",
-  "tagline": "Declarative REST data fetching for React",
-  "body": "## Declarative\r\n\r\nThe days of communicating with your data store using an imperative API are over. Simply declare your data requirements as CRUD endpoints and let Interact fetch and mutate your data accordingly.\r\n\r\n## Colocation\r\n\r\nQueries live next to the views that rely on them, so you can easily reason about your app. No more complex data stores and extensive plumbing needed.",
-  "note": "Don't delete this file! It's used internally to help with page regeneration."
-}
