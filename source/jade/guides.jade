@@ -12,7 +12,7 @@ block content
         li
           a Installation
         li
-          a Conatiners
+          a Containers
           
     .col-md-9
       .page-header
@@ -35,46 +35,86 @@ block content
                 import React, { Component } from 'react'
                 import { createContainer } from 'react-interact'
 
-                class MyComponent extends Component {
+                class TodoList extends Component {
 
                   render() {
                     return <div>
-                      {this.props.dinosaurs.map(dinosaur => {
-                        return `${dinosaur.name}, `
-                      })}
+                      {this.props.todos.map(todo => `${todo.title}, `)}
                     </div>
                   },
                   
                 }
 
-                export default createContainer(MyComponent, () => ({
-                  dinosaurs: '/api/v1/dinosaurs',
+                export default createContainer(TodoList, () => ({
+                  todos: '/api/v1/todos',
                 }))
                 
           h4 Network request
           pre
-            code GET /api/v1/dinosaurs
+            code GET /api/v1/todos
               
           h4 Response
           pre
             code.
               [
-                {id: 1, name: 'Triceratops'},
-                {id: 2, name: 'Tyrannosaurus'},
-                {id: 3, name: 'Giraffatitan'},
+                {id: 1, title: 'Laundry'},
+                {id: 2, title: 'Weights'},
+                {id: 3, title: 'Stroke the cat'},
               ]
           
           h4 Result
-          p Triceratops, Tyrannosaurus, Giraffatitan,
+          p Laundry, Weights, Stroke the cat,
           
       +space
-      a.btn.btn-lg.btn-primary(href=uri_prefix+"/guides_containers.html") Configuring Containers
+      a.btn.btn-lg.btn-primary(href=uri_prefix+"/guides_containers.html") Containers in Depth
       
       +space
       h2 Mutations
       
+      p Fetching data from the server is an important first step but what do we do about mutating data on the server. For example creating new documents/items or udpating and deleting existing ones.
+      
+      p Interact makes mutations easy by providing wrapped components with an  
+        code interact
+        | &nbsp;function prop that can be used to send requests to the backend.
+        
+      p For example:
+      
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <div>
+                    {this.props.todos.map(todo => `${todo.title}, `)}
+                    <a onClick={this.handleAddTodo.bind(this)}>Add Todo</a>
+                  </div>
+                )
+              },
+
+              handleAddTodo() {
+                this.props.interact('todos', 'create', {
+                  payload: {},
+                })
+              },
+            }
+
+            export default createContainer(TodoList, () => ({
+              todos: '/api/v1/todos',
+            }))
+      
       +space
-      a.btn.btn-lg.btn-primary(href=uri_prefix+"/.html") More About Mutations
+      a.btn.btn-lg.btn-primary(href=uri_prefix+"/.html") Mutations in Depth
+      
+      +space
+      h2 Subresources
+      
+      +space
+      a.btn.btn-lg.btn-primary(href=uri_prefix+"/.html") Subresources in Depth
       
       +space
       +space

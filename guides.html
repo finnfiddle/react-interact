@@ -2,20 +2,20 @@
 <html lang="en">
   <head>
     <title>Interact</title>
-    <link rel="stylesheet" href="/react-interact//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
-    <link rel="stylesheet" href="/react-interact/css/main.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
   <body>
     <nav class="navbar navbar-default">
       <div class="container-fluid">
-        <div class="navbar-header"><a href="/react-interact/" class="navbar-brand">Interact</a></div>
+        <div class="navbar-header"><a href="/" class="navbar-brand">Interact</a></div>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="/react-interact/">Home</a></li>
-          <li><a href="/react-interact/guides.html">Guides</a></li>
-          <li><a href="/react-interact/docs.html">Docs</a></li>
-          <li><a href="/react-interact">Github</a></li>
+          <li><a href="/">Home</a></li>
+          <li><a href="/guides.html">Guides</a></li>
+          <li><a href="/docs.html">Docs</a></li>
+          <li><a href="">Github</a></li>
         </ul>
       </div>
     </nav>
@@ -24,7 +24,7 @@
         <div class="col-md-3"><br/><br/>
           <ul>
             <li><a>Installation</a></li>
-            <li><a>Conatiners</a></li>
+            <li><a>Containers</a></li>
           </ul>
         </div>
         <div class="col-md-9">
@@ -41,36 +41,63 @@
               <pre><code class="javascript">import React, { Component } from 'react'
 import { createContainer } from 'react-interact'
 
-class MyComponent extends Component {
+class TodoList extends Component {
 
   render() {
     return &lt;div&gt;
-      {this.props.dinosaurs.map(dinosaur =&gt; {
-        return `${dinosaur.name}, `
-      })}
+      {this.props.todos.map(todo =&gt; `${todo.title}, `)}
     &lt;/div&gt;
   },
   
 }
 
-export default createContainer(MyComponent, () =&gt; ({
-  dinosaurs: '/api/v1/dinosaurs',
+export default createContainer(TodoList, () =&gt; ({
+  todos: '/api/v1/todos',
 }))
 </code></pre>
               <h4>Network request</h4>
-              <pre><code>GET /api/v1/dinosaurs</code></pre>
+              <pre><code>GET /api/v1/todos</code></pre>
               <h4>Response</h4>
               <pre><code>[
-  {id: 1, name: 'Triceratops'},
-  {id: 2, name: 'Tyrannosaurus'},
-  {id: 3, name: 'Giraffatitan'},
+  {id: 1, title: 'Laundry'},
+  {id: 2, title: 'Weights'},
+  {id: 3, title: 'Stroke the cat'},
 ]
 </code></pre>
               <h4>Result</h4>
-              <p>Triceratops, Tyrannosaurus, Giraffatitan,</p>
+              <p>Laundry, Weights, Stroke the cat,</p>
             </div>
-          </div><br/><br/><a href="/react-interact/guides_containers.html" class="btn btn-lg btn-primary">Configuring Containers</a><br/><br/>
-          <h2>Mutations</h2><br/><br/><a href="/react-interact/.html" class="btn btn-lg btn-primary">More About Mutations</a><br/><br/><br/><br/><br/><br/>
+          </div><br/><br/><a href="/guides_containers.html" class="btn btn-lg btn-primary">Containers in Depth</a><br/><br/>
+          <h2>Mutations</h2>
+          <p>Fetching data from the server is an important first step but what do we do about mutating data on the server. For example creating new documents/items or udpating and deleting existing ones.</p>
+          <p>Interact makes mutations easy by providing wrapped components with an  <code>interact</code>&nbsp;function prop that can be used to send requests to the backend.</p>
+          <p>For example:</p>
+          <pre><code class="javascript">import React, { Component } from 'react'
+import { createContainer } from 'react-interact'
+
+class TodoList extends Component {
+
+  render() {
+    return (
+      &lt;div&gt;
+        {this.props.todos.map(todo =&gt; `${todo.title}, `)}
+        &lt;a onClick={this.handleAddTodo.bind(this)}&gt;Add Todo&lt;/a&gt;
+      &lt;/div&gt;
+    )
+  },
+
+  handleAddTodo() {
+    this.props.interact('todos', 'create', {
+      payload: {},
+    })
+  },
+}
+
+export default createContainer(TodoList, () =&gt; ({
+  todos: '/api/v1/todos',
+}))
+</code></pre><br/><br/><a href="/.html" class="btn btn-lg btn-primary">Mutations in Depth</a><br/><br/>
+          <h2>Subresources</h2><br/><br/><a href="/.html" class="btn btn-lg btn-primary">Subresources in Depth</a><br/><br/><br/><br/><br/><br/>
         </div>
       </div>
     </div>

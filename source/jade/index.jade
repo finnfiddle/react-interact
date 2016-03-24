@@ -28,39 +28,39 @@ block content
             import React, { Component } from 'react'
             import { createContainer } from 'react-interact'
 
-            class MyComponent extends Component {
+            class TodoList extends Component {
 
               render() {
                 return <div>
-                  {this.props.dinosaurs.map(dinosaur => {
-                    return `${dinosaur.name}, `
+                  {this.props.todos.map(todo => {
+                    return `${todo.title}, `
                   })}
                 </div>
               },
               
             }
 
-            export default createContainer(MyComponent, () => ({
-              dinosaurs: '/api/v1/dinosaurs',
+            export default createContainer(TodoList, () => ({
+              todos: '/api/v1/todos',
             }))
             
     .col-xs-6
       h2 &nbsp;
       h4 Network request
       pre
-        code GET /api/v1/dinosaurs
+        code GET /api/v1/todos
           
       h4 Response
       pre
         code.
           [
-            {id: 1, name: 'Triceratops'},
-            {id: 2, name: 'Tyrannosaurus'},
-            {id: 3, name: 'Giraffatitan'},
+            {id: 1, title: 'Laundry', done: true},
+            {id: 2, title: 'Weights', done: false},
+            {id: 3, title: 'Stroke the cat', done: false},
           ]
       
       h4 Result
-      p Triceratops, Tyrannosaurus, Giraffatitan,
+      p Laundry, Weights, Stroke the cat,
       
   +space
   

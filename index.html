@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <title>Interact</title>
-    <link rel="stylesheet" href="/react-interact//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
-    <link rel="stylesheet" href="/react-interact/css/main.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
@@ -11,7 +11,7 @@
     <div class="container">
       <div class="jumbotron">
         <h1>Interact</h1>
-        <p>Declarative REST data fetching for React</p><a href="/react-interact/guides.html" class="btn btn-lg btn-primary">Get Started</a>
+        <p>Declarative REST data fetching for React</p><a href="/guides.html" class="btn btn-lg btn-primary">Get Started</a>
       </div>
       <div class="row">
         <div class="col-sm-4">
@@ -33,40 +33,40 @@
           <pre><code class="javascript">import React, { Component } from 'react'
 import { createContainer } from 'react-interact'
 
-class MyComponent extends Component {
+class TodoList extends Component {
 
   render() {
     return &lt;div&gt;
-      {this.props.dinosaurs.map(dinosaur =&gt; {
-        return `${dinosaur.name}, `
+      {this.props.todos.map(todo =&gt; {
+        return `${todo.title}, `
       })}
     &lt;/div&gt;
   },
   
 }
 
-export default createContainer(MyComponent, () =&gt; ({
-  dinosaurs: '/api/v1/dinosaurs',
+export default createContainer(TodoList, () =&gt; ({
+  todos: '/api/v1/todos',
 }))
 </code></pre>
         </div>
         <div class="col-xs-6">
           <h2>&nbsp;</h2>
           <h4>Network request</h4>
-          <pre><code>GET /api/v1/dinosaurs</code></pre>
+          <pre><code>GET /api/v1/todos</code></pre>
           <h4>Response</h4>
           <pre><code>[
-  {id: 1, name: 'Triceratops'},
-  {id: 2, name: 'Tyrannosaurus'},
-  {id: 3, name: 'Giraffatitan'},
+  {id: 1, title: 'Laundry', done: true},
+  {id: 2, title: 'Weights', done: false},
+  {id: 3, title: 'Stroke the cat', done: false},
 ]
 </code></pre>
           <h4>Result</h4>
-          <p>Triceratops, Tyrannosaurus, Giraffatitan,</p>
+          <p>Laundry, Weights, Stroke the cat,</p>
         </div>
       </div><br/><br/>
       <div class="row">
-        <div class="col-xs-12 text-center"><a href="/react-interact/guides.html" class="btn btn-lg btn-primary">Guides</a>&nbsp;&nbsp;<a href="/react-interact/docs.html" class="btn btn-lg btn-primary">Docs</a>&nbsp;&nbsp;<a href="/react-interact" class="btn btn-lg btn-primary">Github</a></div>
+        <div class="col-xs-12 text-center"><a href="/guides.html" class="btn btn-lg btn-primary">Guides</a>&nbsp;&nbsp;<a href="/docs.html" class="btn btn-lg btn-primary">Docs</a>&nbsp;&nbsp;<a href="" class="btn btn-lg btn-primary">Github</a></div>
       </div><br/><br/><br/><br/>
     </div>
   </body>
