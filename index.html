@@ -16,15 +16,15 @@
       <div class="row">
         <div class="col-sm-4">
           <h3>Declarative</h3>
-          <p>The days of communicating with your data store using an imperative API are over. Simply declare your data requirements and let Interact fetch your data when needed.</p>
+          <p>The days of communicating with your data store using an imperative API are over. Simply declare your data requirements and let Interact fetch and mutate your data when needed.</p>
         </div>
         <div class="col-sm-4">
           <h3>Colocation</h3>
-          <p>Queries live next to the views that rely on them, so you can easily reason about your app. No more complex state management systems.</p>
+          <p>Queries live next to the views that rely on them, so you can easily reason about your app. No more complex state management systems and data flow.</p>
         </div>
         <div class="col-sm-4">
           <h3>REST</h3>
-          <p>Plug it in and start communicating immediately with your existing REST API. </p>
+          <p>Plug it in and start communicating immediately with your existing REST API or other 3rd party APIs. No specialized server-side architechture needed.</p>
         </div>
       </div>
       <div class="row">
@@ -56,9 +56,9 @@ export default createContainer(TodoList, () =&gt; ({
           <pre><code>GET /api/v1/todos</code></pre>
           <h4>Response</h4>
           <pre><code>[
-  {id: 1, title: 'Laundry', done: true},
-  {id: 2, title: 'Weights', done: false},
-  {id: 3, title: 'Stroke the cat', done: false},
+  {id: 1, title: 'Laundry'},
+  {id: 2, title: 'Weights'},
+  {id: 3, title: 'Stroke the cat'},
 ]
 </code></pre>
           <h4>Result</h4>

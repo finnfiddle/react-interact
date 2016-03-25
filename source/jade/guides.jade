@@ -6,27 +6,24 @@ block navbar
 block content      
   
   .row
-    .col-md-3
-      +space
-      ul
-        li
-          a Installation
-        li
-          a Containers
+    +menu
           
     .col-md-9
       .page-header
         h1 Getting Started
         
+        
+      #installation
       h2 Installation
       pre
         code.shell npm install react-interact
         
-      +space
+      #containers
+        +space
       h2 Containers
       p Containers are higher-order components that communicate with the backend to fetch and mutate data. They pass the data to the wrapped component as props. And they can be configured in various ways so that they know how and where to perform certain CRUD operations.
       
-      h3 Basic Example
+      h3 Example
       .row
         .col-xs-12
           pre
@@ -66,9 +63,10 @@ block content
           p Laundry, Weights, Stroke the cat,
           
       +space
-      a.btn.btn-lg.btn-primary(href=uri_prefix+"/guides_containers.html") Containers in Depth
+      a.btn.btn-md.btn-primary(href=uri_prefix+"/guides_containers.html") Containers in Depth
       
-      +space
+      #mutations
+        +space
       h2 Mutations
       
       p Fetching data from the server is an important first step but what do we do about mutating data on the server. For example creating new documents/items or udpating and deleting existing ones.
@@ -77,7 +75,7 @@ block content
         code interact
         | &nbsp;function prop that can be used to send requests to the backend.
         
-      p For example:
+      h3 Example
       
       pre
         code.javascript
@@ -97,9 +95,7 @@ block content
               },
 
               handleAddTodo() {
-                this.props.interact('todos', 'create', {
-                  payload: {},
-                })
+                this.props.interact.todos.create({})
               },
             }
 
@@ -108,13 +104,75 @@ block content
             }))
       
       +space
-      a.btn.btn-lg.btn-primary(href=uri_prefix+"/.html") Mutations in Depth
+      a.btn.btn-md.btn-primary(href=uri_prefix+"/guides_mutations.html") Mutations in Depth
       
-      +space
+      #subresources
+        +space
       h2 Subresources
       
+      p Resources that we defined in our containers can also have subresources.
+      
+      h3 Basic Example
+      
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <ul>
+                    {this.props.todos.map(todo => (
+                      <li>
+                        {todo.title}
+                        <ul>
+                          {todo.subTodos.map(subTodo => (
+                            <li>{subTodo.title}</li>
+                          ))}
+                        </ul>
+                        <a 
+                          onClick={this.handleAddSubTodo.bind(this, todo.id)}
+                        >
+                          Add SubTodo
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                )
+              },
+
+              handleAddSubTodo(id) {
+                this.props.interact.todos.select(id).subTodos.create({})
+              },
+            }
+
+            export default createContainer(TodoList, ({ id }) => ({
+              todos: {
+                base: '/api/v1/todos',
+                item: `/${id}`,
+                subs: ({ id }) => ({
+                  subTodos: {
+                    base: '/sub_todos',
+                    item: `/${id}`,
+                  },
+                }),
+              },
+            }))
+      
+      
       +space
-      a.btn.btn-lg.btn-primary(href=uri_prefix+"/.html") Subresources in Depth
+      a.btn.btn-md.btn-primary(href=uri_prefix+"/.html") Subresources in Depth
+      
+      #custom_agents
+        +space
+      h2 Custom Agents
+      h3 Example
+      
+      +space
+      a.btn.btn-md.btn-primary(href=uri_prefix+"/.html") Custom Agents in Depth
       
       +space
       +space

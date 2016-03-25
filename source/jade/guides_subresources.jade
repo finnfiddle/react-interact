@@ -1,0 +1,55 @@
+extends ./includes/layout.jade
+
+block content
+  
+  .row
+    +menu
+    
+    .col-md-9
+      .page-header
+        h1 Subresources
+        
+      p Reading data from the server is an important part of an application but when we want to add interactivity we need to be able to also mutate it.
+      
+      h3 Create
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <div>
+                    {this.props.todos.map(todo => `${todo.title}, `)}
+                    <a onClick={this.handleAddTodo.bind(this)}>Add Todo</a>
+                  </div>
+                )
+              },
+
+              handleAddTodo() {
+                this.props.interact('todos', 'create', {
+                  payload: {
+                    title: 'New Todo',
+                  },
+                })
+              },
+            }
+
+            export default createContainer(TodoList, () => ({
+              todos: '/api/v1/todos',
+            }))
+      
+      +space    
+      
+      
+      +space    
+
+      
+      a.btn.btn-md.btn-primary(href="/guides_subresources.html") Next: Subresources
+          
+      +space    
+      +space    
+      +space    

@@ -3,17 +3,11 @@ extends ./includes/layout.jade
 block content
   
   .row
-    .col-md-3
-      +space
-      ul
-        li
-          a Installation
-        li
-          a Conatiners
+    +menu
           
     .col-md-9
       .page-header
-        h1 Configuring Containers
+        h1 Containers
         
       p Containers need to be configured so that they know where and how to send network requests. The second argument to 
         code Interact.createContainer()

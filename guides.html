@@ -23,19 +23,25 @@
       <div class="row">
         <div class="col-md-3"><br/><br/>
           <ul>
-            <li><a>Installation</a></li>
-            <li><a>Containers</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#containers">Containers</a></li>
+            <li><a href="#mutations">Mutations</a></li>
+            <li><a href="#subresources">Subresources</a></li>
+            <li><a href="#custom_agents">Custom Agents</a></li>
           </ul>
         </div>
         <div class="col-md-9">
           <div class="page-header">
             <h1>Getting Started</h1>
           </div>
+          <div id="installation"></div>
           <h2>Installation</h2>
-          <pre><code class="shell">npm install react-interact</code></pre><br/><br/>
+          <pre><code class="shell">npm install react-interact</code></pre>
+          <div id="containers"><br/><br/>
+          </div>
           <h2>Containers</h2>
           <p>Containers are higher-order components that communicate with the backend to fetch and mutate data. They pass the data to the wrapped component as props. And they can be configured in various ways so that they know how and where to perform certain CRUD operations.</p>
-          <h3>Basic Example</h3>
+          <h3>Example</h3>
           <div class="row">
             <div class="col-xs-12">
               <pre><code class="javascript">import React, { Component } from 'react'
@@ -67,11 +73,13 @@ export default createContainer(TodoList, () =&gt; ({
               <h4>Result</h4>
               <p>Laundry, Weights, Stroke the cat,</p>
             </div>
-          </div><br/><br/><a href="/guides_containers.html" class="btn btn-lg btn-primary">Containers in Depth</a><br/><br/>
+          </div><br/><br/><a href="/guides_containers.html" class="btn btn-md btn-primary">Containers in Depth</a>
+          <div id="mutations"><br/><br/>
+          </div>
           <h2>Mutations</h2>
           <p>Fetching data from the server is an important first step but what do we do about mutating data on the server. For example creating new documents/items or udpating and deleting existing ones.</p>
           <p>Interact makes mutations easy by providing wrapped components with an  <code>interact</code>&nbsp;function prop that can be used to send requests to the backend.</p>
-          <p>For example:</p>
+          <h3>Example</h3>
           <pre><code class="javascript">import React, { Component } from 'react'
 import { createContainer } from 'react-interact'
 
@@ -87,17 +95,69 @@ class TodoList extends Component {
   },
 
   handleAddTodo() {
-    this.props.interact('todos', 'create', {
-      payload: {},
-    })
+    this.props.interact.todos.create({})
   },
 }
 
 export default createContainer(TodoList, () =&gt; ({
   todos: '/api/v1/todos',
 }))
-</code></pre><br/><br/><a href="/.html" class="btn btn-lg btn-primary">Mutations in Depth</a><br/><br/>
-          <h2>Subresources</h2><br/><br/><a href="/.html" class="btn btn-lg btn-primary">Subresources in Depth</a><br/><br/><br/><br/><br/><br/>
+</code></pre><br/><br/><a href="/guides_mutations.html" class="btn btn-md btn-primary">Mutations in Depth</a>
+          <div id="subresources"><br/><br/>
+          </div>
+          <h2>Subresources</h2>
+          <p>Resources that we defined in our containers can also have subresources.</p>
+          <h3>Basic Example</h3>
+          <pre><code class="javascript">import React, { Component } from 'react'
+import { createContainer } from 'react-interact'
+
+class TodoList extends Component {
+
+  render() {
+    return (
+      &lt;ul&gt;
+        {this.props.todos.map(todo =&gt; (
+          &lt;li&gt;
+            {todo.title}
+            &lt;ul&gt;
+              {todo.subTodos.map(subTodo =&gt; (
+                &lt;li&gt;{subTodo.title}&lt;/li&gt;
+              ))}
+            &lt;/ul&gt;
+            &lt;a 
+              onClick={this.handleAddSubTodo.bind(this, todo.id)}
+            &gt;
+              Add SubTodo
+            &lt;/a&gt;
+          &lt;/li&gt;
+        )}
+      &lt;/ul&gt;
+    )
+  },
+
+  handleAddSubTodo(id) {
+    this.props.interact.todos.select(id).subTodos.create({})
+  },
+}
+
+export default createContainer(TodoList, ({ id }) =&gt; ({
+  todos: {
+    base: '/api/v1/todos',
+    item: `/${id}`,
+    subs: ({ id }) =&gt; ({
+      subTodos: {
+        base: '/sub_todos',
+        item: `/${id}`,
+      },
+    }),
+  },
+}))
+
+</code></pre><br/><br/><a href="/.html" class="btn btn-md btn-primary">Subresources in Depth</a>
+          <div id="custom_agents"><br/><br/>
+          </div>
+          <h2>Custom Agents</h2>
+          <h3>Example</h3><br/><br/><a href="/.html" class="btn btn-md btn-primary">Custom Agents in Depth</a><br/><br/><br/><br/><br/><br/>
         </div>
       </div>
     </div>

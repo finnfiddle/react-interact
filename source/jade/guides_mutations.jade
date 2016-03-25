@@ -1,0 +1,150 @@
+extends ./includes/layout.jade
+
+block content
+  
+  .row
+    +menu
+          
+    .col-md-9
+      .page-header
+        h1 Mutations
+        
+      p Reading data from the server is an important part of an application but when we want to add interactivity we need to be able to also mutate it.
+      
+      p Interact gives us the power to perform CRUD operations on our resources defined by our containers by passing a prop 
+        code interact
+        | &nbsp;to the wrapped component.
+        
+      p The 
+        code interact
+        | &nbsp;prop takes 3 arguments. First is the name/key of the resource that we defined in our container, second is the operation to be performed (read, update, create, remove, list), and the third is an object of parameters for the request like item 
+        code id
+        | , 
+        code payload
+        | , etc...
+        
+      p Read the docs for the full list of available options 
+        a(href="") here
+        | .
+
+
+      h3 Create
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <div>
+                    {this.props.todos.map(todo => `${todo.title}, `)}
+                    <a onClick={this.handleAddTodo.bind(this)}>Add Todo</a>
+                  </div>
+                )
+              },
+
+              handleAddTodo() {
+                this.props.interact.todos.create({
+                  title: 'New Todo',
+                })
+              },
+            }
+
+            export default createContainer(TodoList, () => ({
+              todos: '/api/v1/todos',
+            }))
+      
+      +space    
+      
+      
+      h3 Update
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <ul>
+                    {this.props.todos.map(todo => {
+                      const onClick = handleUpdateTodo.bind(this, {
+                        id: todo.id,
+                        payload: {
+                          done: !todo.done,
+                        },
+                      })
+                      
+                      return (
+                        <li>
+                          <a onClick={onClick}>{todo.title}</a>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )
+              },
+
+              handleUpdateTodo({id, payload}) {
+                this.props.interact.todos.select(id).update(payload)
+              },
+            }
+
+            export default createContainer(TodoList, () => ({
+              todos: '/api/v1/todos',
+            }))
+      
+      +space    
+      
+      
+      h3 Delete
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <ul>
+                    {this.props.todos.map(todo => {
+                      const onClick = handleRemoveTodo.bind(this, todo.id)
+                      
+                      return (
+                        <li>
+                          <a onClick={onClick}>{todo.title}</a>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )
+              },
+
+              handleRemoveTodo(id) {
+                this.props.interact.todos.select(id).remove()
+              },
+            }
+
+            export default createContainer(TodoList, () => ({
+              todos: '/api/v1/todos',
+            }))
+      
+      +space    
+      
+      h3 Callbacks
+      
+      +space    
+
+      
+      a.btn.btn-md.btn-primary(href="/guides_subresources.html") Next: Subresources
+          
+      +space    
+      +space    
+      +space    
