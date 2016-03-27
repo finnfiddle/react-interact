@@ -1,12 +1,16 @@
 import React from 'react'
 import stamp from 'react-stamp'
-import _ from 'nimble'
 import cloneDeep from 'lodash.clonedeep'
-import reject from 'lodash.reject'
 
-import { OPERATIONS, RESOURCE_DEFAULTS } from './constants'
-import { isSet, isString, isFunction } from './utils'
+import {
+  isFunction,
+  fetch,
+  normalizeResource,
+  addNamesToResources,
+  mergeResponse,
+} from './utils'
 import DefaultAgent from './defaultAgent'
+import ResourcesMutator from './resourcesMutator'
 
 export default {
 
@@ -16,8 +20,11 @@ export default {
 
         init() {
           this.WrappedElement = WrappedElement
-          this.getResources = getResources
-          this.agent = agent || DefaultAgent()
+          this.getResources = params => this._getNormalizedResources(
+            params,
+            getResources
+          )
+          this.agent = agent || DefaultAgent
         },
 
         state: {
@@ -25,7 +32,7 @@ export default {
         },
 
         componentDidMount() {
-          this.fetch(this.props)
+          this.fetch({props: this.props})
         },
 
         componentWillReceiveProps(nextProps) {
@@ -34,13 +41,15 @@ export default {
 
         render() {
           let result
-          if(this.state._hasFetched) {
-            const Wrapped = this.WrappedElement
+          let Wrapped
+
+          if (this.state._hasFetched) {
+            Wrapped = this.WrappedElement
             result = (
               <Wrapped
                 {...this.state}
                 {...this.props}
-                interact={::this.handleRequest}
+                interact={::this.requestHandler()}
               />
             )
           }
@@ -50,174 +59,66 @@ export default {
               <div />
             )
           }
+
           return result
         },
 
-        handleRequest(resourceName, operationName, data, callback) {
-          const resource = this.getResources({
+        requestHandler() {
+          return ResourcesMutator({
+            agent: this.agent,
+            getResources: this.getResources,
             props: this.props,
-            id: data.id,
-            payload: data.payload,
-          })[resourceName]
-
-          this._getRequest({resource, operationName, data})
-            .end(this._handleResponse({
-              resourceName,
-              operationName,
-              callback,
-            }))
+            onResponse: this._handleResponse.bind(this),
+          })
         },
 
         _handleResponse({
-          resource,
-          resourceName,
-          operationName,
-          callback,
-        }) {
-          return (err, res) => {
-            if(err) reject(err)
-            if(!res.ok) reject(res.body)
-            if(isFunction(callback)) {
-              let clonedResource = cloneDeep(this.state[resourceName])
-              callback(res.body, clonedResource, () => {
-                this.setState({[resourceName]: clonedResource})
-              })
-            }
-            else {
-              this._mergeResponse({
-                response: res.body,
-                resource,
-                resourceName,
-                operationName,
-              })
-            }
-          }
-        },
-
-        _mergeResponse({
+          request,
           response,
-          resource,
-          resourceName,
-          operationName,
-        }){
-          let data = cloneDeep(this.state)[resourceName]
-          const uid = { resource }
+        }) {
+          const { resource, operationName } = request
 
-          switch(operationName) {
-            case 'create':
-              data.push(response)
-              break
-            case 'patch':
-            case 'update':
-              let updatee = data.filter(d => d[uid] === response[uid])[0]
-              if(isSet(updatee)) Object.assign(updatee, response)
-              break
-            case 'remove':
-              reject(data, {[uid]: response[uid]})
-              break
-            default:
-              break
+          if (isFunction(request.callback)) {
+            let clonedResource = cloneDeep(this.state[resource.name])
+            request.callback(response, clonedResource, () => {
+              this.setState({[resource.name]: clonedResource})
+            })
           }
-          this.setState({[resourceName]: data})
+          else {
+            mergeResponse({
+              currentData: this.state[resource.name],
+              response,
+              request,
+            })
+            .then(result => this.setState({[resource.name]: result}))
+          }
         },
 
-        fetch(props) {
-          let result = {}
-          let resources = getResources({props})
-          _.map(resources, (resource, key, next) => {
-            this._getRequest({resource}).end((err, res) => {
-              if(err) return next(err)
-              if(!res.ok) return next(res)
-              result[key] = res.body
-              next(null)
-            })
-          }, (err) => {
-            if(err) console.log(err)
+        fetch({ props }) {
+          fetch({
+            params: {props},
+            agent: this.agent,
+            getResources: this.getResources,
+          })
+          .then(result => {
             this.setState(Object.assign({}, result, {_hasFetched: true}))
           })
         },
 
-        _getRequest({ resource, operationName, data }) {
-          const normalizedResource = this._normalizeResource(resource)
-          let operation
-          if(typeof operationName === 'undefined') {
-            operation = normalizedResource[normalizedResource.defaultOperation]
-          }
-          else {
-            operation = normalizedResource[operationName]
-          }
-          return this.agent.request({
-            operation,
-            resource: normalizedResource,
-            data
-          })
-        },
+        _getNormalizedResources(params, accessor) {
+          let resources = accessor(params)
+          let normalizedResources = {}
 
-        _normalizeResource(resourceData) {
-          let resource = {}
-
-          const data = Object.assign({}, RESOURCE_DEFAULTS, resourceData)
-
-          resource.defaultOperation = data.defaultOperation
-          resource.base = data.base
-          resource.list = this._normalizeOperation({
-            resource: data,
-            operationName: 'list',
-            defaultMethod: 'GET',
-          })
-          resource.create = this._normalizeOperation({
-            resource: data,
-            operationName: 'create',
-            defaultMethod: 'POST',
-          })
-
-          if(isSet(data.item)) {
-            resource.read = {method: 'GET', uri: data.item}
-            resource.update = {method: 'PUT', uri: data.item}
-            resource.patch = {method: 'PATCH', uri: data.item}
-            resource.remove = {method: 'DELETE', uri: data.item}
-          }
-          else {
-
-            OPERATIONS.forEach((operation) => {
-              resource[operation.name] = this._normalizeOperation({
-                resource: data,
-                operationName: operation.name,
-                defaultMethod: operation.defaultMethod,
-              })
-            })
+          for (let k in resources) {
+            normalizedResources[k] = normalizeResource(resources[k])
           }
 
-          return resource
-        },
+          addNamesToResources(normalizedResources)
 
-        _normalizeOperation({ resource, operationName, defaultMethod }) {
-          let result
-          if(isSet(resource[operationName])) {
-            if(isString(resource[operationName])) {
-              result = {
-                method: defaultMethod,
-                uri: resource[operationName]
-              }
-            }
-            else {
-              result = Object.assign(
-                {method: defaultMethod},
-                resource[operationName]
-              )
-            }
-          }
-          return result
+          return normalizedResources
         },
 
       })
   },
-
-  // resource(base, name, props) {
-  //   return {
-  //     base: `${base}/${name}`,
-  //     item: `/${props.params[name]}`,
-  //   }
-  // },
 
 }

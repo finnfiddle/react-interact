@@ -1,11 +1,3 @@
-export const VERBS_AS_METHODS = {
-  POST: 'post',
-  GET: 'get',
-  PUT: 'put',
-  DELETE: 'del',
-  PATCH: 'patch',
-}
-
 export const OPERATIONS = [
   {name: 'list', defaultMethod: 'GET'},
   {name: 'create', defaultMethod: 'POST'},
