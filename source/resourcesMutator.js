@@ -22,7 +22,6 @@ let createMutator = ({
         uri: `${baseUri}${selectedResource.base}${selectedResource.update.uri}`,
         operationName: 'update',
         resource: selectedResource,
-        method: selectedResource.update.method,
         payload,
         callback,
       })
@@ -32,7 +31,6 @@ let createMutator = ({
         uri: `${baseUri}${selectedResource.base}${selectedResource.read.uri}`,
         operationName: 'read',
         resource: selectedResource,
-        method: selectedResource.read.method,
       })
       .then(onResponse),
 
@@ -40,7 +38,6 @@ let createMutator = ({
         uri: `${baseUri}${selectedResource.base}${selectedResource.remove.uri}`,
         operationName: 'remove',
         resource: selectedResource,
-        method: selectedResource.remove.method,
         callback,
       })
       .then(onResponse),
@@ -65,7 +62,6 @@ let createMutator = ({
     uri: `${baseUri}${resource.base}${resource.create.uri}`,
     operationName: 'create',
     resource,
-    method: resource.create.method,
     payload,
     callback,
   })
@@ -75,7 +71,6 @@ let createMutator = ({
     uri: `${baseUri}${resource.base}${resource.list.uri}`,
     operationName: 'list',
     resource,
-    method: resource.list.method,
   })
   .then(onResponse)
 

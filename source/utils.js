@@ -1,6 +1,6 @@
 import { Promise } from 'es6-promise'
 import cloneDeep from 'lodash.clonedeep'
-import * as rejectWhere from 'lodash.reject'
+import rejectWhere from 'lodash.reject'
 import { map as asyncMap } from 'nimble'
 
 import { OPERATIONS, RESOURCE_DEFAULTS } from './constants'

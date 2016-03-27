@@ -12,11 +12,13 @@ const VERBS_AS_METHODS = {
 
 export default (request) => new Promise((resolve, reject) => {
 
-  const requestMethod = VERBS_AS_METHODS[request.method]
+  const { method } = request.resource[request.operationName]
+
+  const requestMethod = VERBS_AS_METHODS[method]
   let req = agent[requestMethod](request.uri)
 
   if (
-    ['POST', 'PUT', 'PATCH'].indexOf(request.method) > -1 &&
+    ['POST', 'PUT', 'PATCH'].indexOf(method) > -1 &&
     isSet(request.payload)
   ) req.send(request.payload)
 
