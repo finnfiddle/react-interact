@@ -1,1 +1,1 @@
-import test from 'blue-tape'
+import './utils/normalizeOperation'
