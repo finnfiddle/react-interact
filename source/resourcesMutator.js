@@ -1,5 +1,3 @@
-import { normalizeResource } from './utils'
-
 let ResourcesMutator
 let createMutator = ({
   agent,

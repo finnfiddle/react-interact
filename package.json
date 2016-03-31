@@ -47,6 +47,7 @@
     "jsdom": "8.1.0",
     "jsdom-global": "1.6.2",
     "lodash.clonedeep": "^4.3.1",
+    "lodash.findindex": "^4.2.1",
     "lodash.reject": "^4.2.1",
     "nimble": "0.0.2",
     "node-libs-browser": "^0.5.2",

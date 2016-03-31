@@ -1,6 +1,6 @@
 import { Promise } from 'es6-promise'
 import cloneDeep from 'lodash.clonedeep'
-import rejectWhere from 'lodash.reject'
+import findIndex from 'lodash.findindex'
 import { map as asyncMap } from 'nimble'
 
 import { OPERATIONS, RESOURCE_DEFAULTS } from './constants'
@@ -29,37 +29,21 @@ const normalizeOperation = ({ resource, operationName, defaultMethod }) => {
   return result
 }
 
-const fetch = ({ params, getResources, agent }) => {
-
-  let result = {}
-  let resources = getResources(params)
-
-  return new Promise((resolve, reject) => {
-    asyncMap(resources, (resource, key, next) => {
-      const operationName = resource.defaultOperation
-
-      agent({
-        uri: `${resource.base}${resource[operationName].uri}`,
-        resource,
-        method: resource[operationName].method,
-      })
-      .then(({ response }) => {
-        result[key] = response.body
-        next(null)
-      })
-
-    }, (err) => {
-      if (err) reject(err)
-      else resolve(result)
-    })
-  })
-
-}
-
-const normalizeResource = (resourceData) => {
+const normalizeResource = (resourceData, params) => {
   let resource = {}
+  let normalizedResourceData
 
-  const data = Object.assign({}, RESOURCE_DEFAULTS, resourceData)
+  if (isString(resourceData)) {
+    normalizedResourceData = {
+      base: resourceData,
+      item: `/${params.id}`,
+    }
+  }
+  else {
+    normalizedResourceData = resourceData
+  }
+
+  const data = Object.assign({}, RESOURCE_DEFAULTS, normalizedResourceData)
 
   resource.defaultOperation = data.defaultOperation
   resource.base = data.base
@@ -99,12 +83,25 @@ const addNamesToResources = (resources) => {
   for (let name in resources) resources[name].name = name
 }
 
+const getNormalizedResources = (params, accessor) => {
+  let resources = accessor(params)
+  let normalizedResources = {}
+
+  for (let k in resources) {
+    normalizedResources[k] = normalizeResource(resources[k], params)
+  }
+
+  addNamesToResources(normalizedResources)
+
+  return normalizedResources
+}
+
 const mergeResponse = ({ currentData, response, request }) => {
 
   return new Promise(resolve => {
     let data = cloneDeep(currentData)
     const { resource, operationName } = request
-    const uid = { resource }
+    const uid = resource.uid
     const { body } = response
 
     switch (operationName) {
@@ -117,13 +114,40 @@ const mergeResponse = ({ currentData, response, request }) => {
         if (isSet(updatee)) Object.assign(updatee, body)
         break
       case 'remove':
-        rejectWhere(data, {[uid]: body[uid]})
+        const index = findIndex(data, {[uid]: body[uid]})
+        data.splice(index, 1)
         break
       default:
         break
     }
 
     resolve(data)
+  })
+}
+
+const fetch = ({ params, getResources, agent }) => {
+
+  let result = {}
+  let resources = getResources(params)
+
+  return new Promise((resolve, reject) => {
+    asyncMap(resources, (resource, key, next) => {
+      const operationName = resource.defaultOperation
+
+      agent({
+        uri: `${resource.base}${resource[operationName].uri}`,
+        resource,
+        operationName,
+      })
+      .then(({ response }) => {
+        result[key] = response.body
+        next(null)
+      })
+
+    }, (err) => {
+      if (err) reject(err)
+      else resolve(result)
+    })
   })
 
 }
@@ -137,4 +161,5 @@ export default {
   normalizeOperation,
   addNamesToResources,
   mergeResponse,
+  getNormalizedResources,
 }

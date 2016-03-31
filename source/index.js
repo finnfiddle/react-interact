@@ -8,6 +8,7 @@ import {
   normalizeResource,
   addNamesToResources,
   mergeResponse,
+  getNormalizedResources,
 } from './utils'
 import DefaultAgent from './defaultAgent'
 import ResourcesMutator from './resourcesMutator'
@@ -20,7 +21,7 @@ export default {
 
         init() {
           this.WrappedElement = WrappedElement
-          this.getResources = params => this._getNormalizedResources(
+          this.getResources = params => getNormalizedResources(
             params,
             getResources
           )
@@ -76,7 +77,7 @@ export default {
           request,
           response,
         }) {
-          const { resource, operationName } = request
+          const { resource } = request
 
           if (isFunction(request.callback)) {
             let clonedResource = cloneDeep(this.state[resource.name])
@@ -103,19 +104,6 @@ export default {
           .then(result => {
             this.setState(Object.assign({}, result, {_hasFetched: true}))
           })
-        },
-
-        _getNormalizedResources(params, accessor) {
-          let resources = accessor(params)
-          let normalizedResources = {}
-
-          for (let k in resources) {
-            normalizedResources[k] = normalizeResource(resources[k])
-          }
-
-          addNamesToResources(normalizedResources)
-
-          return normalizedResources
         },
 
       })

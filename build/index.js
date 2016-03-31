@@ -94,11 +94,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return (0, _reactStamp2['default'])(_react2['default']).compose({
 	
 	      init: function init() {
-	        var _this = this;
-	
 	        this.WrappedElement = WrappedElement;
 	        this.getResources = function (params) {
-	          return _this._getNormalizedResources(params, getResources);
+	          return (0, _utils.getNormalizedResources)(params, getResources);
 	        };
 	        this.agent = agent || _defaultAgent2['default'];
 	      },
@@ -142,18 +140,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      },
 	
 	      _handleResponse: function _handleResponse(_ref) {
-	        var _this2 = this;
+	        var _this = this;
 	
 	        var request = _ref.request;
 	        var response = _ref.response;
 	        var resource = request.resource;
-	        var operationName = request.operationName;
 	
 	        if ((0, _utils.isFunction)(request.callback)) {
 	          (function () {
-	            var clonedResource = (0, _lodashClonedeep2['default'])(_this2.state[resource.name]);
+	            var clonedResource = (0, _lodashClonedeep2['default'])(_this.state[resource.name]);
 	            request.callback(response, clonedResource, function () {
-	              _this2.setState(_defineProperty({}, resource.name, clonedResource));
+	              _this.setState(_defineProperty({}, resource.name, clonedResource));
 	            });
 	          })();
 	        } else {
@@ -162,13 +159,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            response: response,
 	            request: request
 	          }).then(function (result) {
-	            return _this2.setState(_defineProperty({}, resource.name, result));
+	            return _this.setState(_defineProperty({}, resource.name, result));
 	          });
 	        }
 	      },
 	
 	      fetch: function fetch(_ref2) {
-	        var _this3 = this;
+	        var _this2 = this;
 	
 	        var props = _ref2.props;
 	
@@ -177,21 +174,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          agent: this.agent,
 	          getResources: this.getResources
 	        }).then(function (result) {
-	          _this3.setState(_extends({}, result, { _hasFetched: true }));
+	          _this2.setState(_extends({}, result, { _hasFetched: true }));
 	        });
-	      },
-	
-	      _getNormalizedResources: function _getNormalizedResources(params, accessor) {
-	        var resources = accessor(params);
-	        var normalizedResources = {};
-	
-	        for (var k in resources) {
-	          normalizedResources[k] = (0, _utils.normalizeResource)(resources[k]);
-	        }
-	
-	        (0, _utils.addNamesToResources)(normalizedResources);
-	
-	        return normalizedResources;
 	      }
 	
 	    });
@@ -8187,7 +8171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * lodash 4.3.1 (Custom Build) <https://lodash.com/>
+	 * lodash 4.3.2 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
 	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -9930,38 +9914,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return result;
 	};
 	
-	var fetch = function fetch(_ref2) {
-	  var params = _ref2.params;
-	  var getResources = _ref2.getResources;
-	  var agent = _ref2.agent;
-	
-	  var result = {};
-	  var resources = getResources(params);
-	
-	  return new _es6Promise.Promise(function (resolve, reject) {
-	    (0, _nimble.map)(resources, function (resource, key, next) {
-	      var operationName = resource.defaultOperation;
-	
-	      agent({
-	        uri: '' + resource.base + resource[operationName].uri,
-	        resource: resource,
-	        method: resource[operationName].method
-	      }).then(function (_ref3) {
-	        var response = _ref3.response;
-	
-	        result[key] = response.body;
-	        next(null);
-	      });
-	    }, function (err) {
-	      if (err) reject(err);else resolve(result);
-	    });
-	  });
-	};
-	
-	var normalizeResource = function normalizeResource(resourceData) {
+	var normalizeResource = function normalizeResource(resourceData, params) {
 	  var resource = {};
+	  var normalizedResourceData = undefined;
 	
-	  var data = _extends({}, _constants.RESOURCE_DEFAULTS, resourceData);
+	  if (isString(resourceData)) {
+	    normalizedResourceData = {
+	      base: resourceData,
+	      item: '/' + params.id
+	    };
+	  } else {
+	    normalizedResourceData = resourceData;
+	  }
+	
+	  var data = _extends({}, _constants.RESOURCE_DEFAULTS, normalizedResourceData);
 	
 	  resource.defaultOperation = data.defaultOperation;
 	  resource.base = data.base;
@@ -10002,10 +9968,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
-	var mergeResponse = function mergeResponse(_ref4) {
-	  var currentData = _ref4.currentData;
-	  var response = _ref4.response;
-	  var request = _ref4.request;
+	var getNormalizedResources = function getNormalizedResources(params, accessor) {
+	  var resources = accessor(params);
+	  var normalizedResources = {};
+	
+	  for (var k in resources) {
+	    normalizedResources[k] = normalizeResource(resources[k], params);
+	  }
+	
+	  addNamesToResources(normalizedResources);
+	
+	  return normalizedResources;
+	};
+	
+	var mergeResponse = function mergeResponse(_ref2) {
+	  var currentData = _ref2.currentData;
+	  var response = _ref2.response;
+	  var request = _ref2.request;
 	
 	  return new _es6Promise.Promise(function (resolve) {
 	    var data = (0, _lodashClonedeep2['default'])(currentData);
@@ -10037,6 +10016,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	};
 	
+	var fetch = function fetch(_ref3) {
+	  var params = _ref3.params;
+	  var getResources = _ref3.getResources;
+	  var agent = _ref3.agent;
+	
+	  var result = {};
+	  var resources = getResources(params);
+	
+	  return new _es6Promise.Promise(function (resolve, reject) {
+	    (0, _nimble.map)(resources, function (resource, key, next) {
+	      var operationName = resource.defaultOperation;
+	
+	      agent({
+	        uri: '' + resource.base + resource[operationName].uri,
+	        resource: resource,
+	        operationName: operationName
+	      }).then(function (_ref4) {
+	        var response = _ref4.response;
+	
+	        result[key] = response.body;
+	        next(null);
+	      });
+	    }, function (err) {
+	      if (err) reject(err);else resolve(result);
+	    });
+	  });
+	};
+	
 	exports['default'] = {
 	  isSet: isSet,
 	  isString: isString,
@@ -10045,7 +10052,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  normalizeResource: normalizeResource,
 	  normalizeOperation: normalizeOperation,
 	  addNamesToResources: addNamesToResources,
-	  mergeResponse: mergeResponse
+	  mergeResponse: mergeResponse,
+	  getNormalizedResources: getNormalizedResources
 	};
 	module.exports = exports['default'];
 
@@ -11125,7 +11133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * lodash 4.2.1 (Custom Build) <https://lodash.com/>
+	 * lodash 4.2.2 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
 	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -11232,7 +11240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * lodash 4.0.0 (Custom Build) <https://lodash.com/>
+	 * lodash 4.0.1 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
 	 * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -15607,16 +15615,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 234 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-	
-	var _utils = __webpack_require__(216);
-	
 	var ResourcesMutator = undefined;
 	var createMutator = function createMutator(_ref) {
 	  var agent = _ref.agent;
