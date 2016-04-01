@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:prod": "gulp prod",
+    "git:add": "git add -A",
     "lint": "jshint .",
     "validate": "npm ls"
   },
@@ -27,6 +28,8 @@
     "gulp-rename": "^1.2.2"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "build:prod",
+    "git:add"
   ]
 }
