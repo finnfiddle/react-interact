@@ -1,13 +1,15 @@
 let ResourcesMutator
-let createMutator = ({
+
+export let createMutator = ({
   agent,
   key,
   getResources,
   props,
-  baseUri,
+  base,
   onResponse,
 }) => {
 
+  const baseUri = base || ''
   let resource = getResources({props})[key]
 
   let Mutator = (id) => {
@@ -25,10 +27,11 @@ let createMutator = ({
       })
       .then(onResponse),
 
-      read: () => agent({
+      read: (callback) => agent({
         uri: `${baseUri}${selectedResource.base}${selectedResource.read.uri}`,
         operationName: 'read',
         resource: selectedResource,
+        callback,
       })
       .then(onResponse),
 
@@ -65,10 +68,11 @@ let createMutator = ({
   })
   .then(onResponse)
 
-  Mutator.list = () => agent({
+  Mutator.list = (callback) => agent({
     uri: `${baseUri}${resource.base}${resource.list.uri}`,
     operationName: 'list',
     resource,
+    callback,
   })
   .then(onResponse)
 
@@ -76,7 +80,7 @@ let createMutator = ({
 
 }
 
-ResourcesMutator = ({getResources, props, base, agent, onResponse}) => {
+export default ({getResources, props, base, agent, onResponse}) => {
 
   const baseUri = base || ''
 
@@ -98,5 +102,3 @@ ResourcesMutator = ({getResources, props, base, agent, onResponse}) => {
 
   return mutator
 }
-
-export default ResourcesMutator

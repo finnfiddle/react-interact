@@ -5,8 +5,6 @@ import cloneDeep from 'lodash.clonedeep'
 import {
   isFunction,
   fetch,
-  normalizeResource,
-  addNamesToResources,
   mergeResponse,
   getNormalizedResources,
 } from './utils'

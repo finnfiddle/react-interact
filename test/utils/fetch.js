@@ -1,19 +1,15 @@
 import _ from 'lodash'
 import test from 'blue-tape'
 
-import {
-  fetch,
-  getNormalizedResources,
-  addNamesToResources,
-} from '../../source/utils'
+import { fetch, getNormalizedResources } from '../../source/utils'
 import agent from '../mock/agent'
+
+const BASE = '/test'
+const ITEM_URI = '/test_id'
 
 test('fetch: default', t => {
 
-  const BASE = '/test'
-  const ITEM_URI = '/test_id'
-
-  const getResources = () => getNormalizedResources({id: 'test_id'}, () => ({
+  const getResources = () => getNormalizedResources({id: ITEM_URI.slice(1)}, () => ({
     testResource: BASE,
   }))
 

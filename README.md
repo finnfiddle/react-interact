@@ -8,11 +8,10 @@ See docs and guides [here](http://finnfiddle.github.io/react-interact/).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-<!-- ## Contents
+## Contents
 
-- [Features](#features)
 - [Getting Started](#getting-started)
-- [Contributing](#contributing) -->
+- [Contributing](#contributing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
