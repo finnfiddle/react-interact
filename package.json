@@ -1,7 +1,7 @@
 {
   "name": "react-interact",
   "description": "Declarative REST data fetching for React",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "main": "build/index.js",
   "scripts": {
     "init": "rimraf .validate.json && rimraf .jshintrc",
@@ -72,7 +72,7 @@
   "bugs": {
     "url": "https://github.com/finnfiddle/react-interact/issues"
   },
-  "homepage": "https://github.com/finnfiddle/react-interact",
+  "homepage": "http://finnfiddle.github.io/react-interact/",
   "repository": {
     "type": "git",
     "url": "https://github.com/finnfiddle/react-interact.git"
