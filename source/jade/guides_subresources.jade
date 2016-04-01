@@ -9,9 +9,11 @@ block content
       .page-header
         h1 Subresources
         
-      p Reading data from the server is an important part of an application but when we want to add interactivity we need to be able to also mutate it.
+      p When defining our containers we can create subresources within resources. Subresources are defined in exactly the same way as resources and are placed in the 
+        code subs
+        | &nbsp;key of the resource.
       
-      h3 Create
+      h3 Basic Example
       pre
         code.javascript
           :escape
@@ -22,33 +24,55 @@ block content
 
               render() {
                 return (
-                  <div>
-                    {this.props.todos.map(todo => `${todo.title}, `)}
-                    <a onClick={this.handleAddTodo.bind(this)}>Add Todo</a>
-                  </div>
+                  <ul>
+                    {this.props.todos.map(todo => (
+                      <li key={todo.id}>
+                        {todo.title}
+                        <ul>
+                          {todo.subTodos.map(subTodo => (
+                            <li 
+                              key={subTodo.id}
+                              onClick={this.handleRemoveSubTodo.bind(this, todo.id, subTodo.id)}
+                            >{subTodo.title}</li>
+                          ))}
+                        </ul>
+                        <a 
+                          onClick={this.handleAddSubTodo.bind(this, todo.id)}
+                        >
+                          Add SubTodo
+                        </a>
+                      </li>
+                    )}
+                  </ul>
                 )
               },
 
-              handleAddTodo() {
-                this.props.interact('todos', 'create', {
-                  payload: {
-                    title: 'New Todo',
-                  },
-                })
+              handleAddSubTodo(id) {
+                this.props.interact.todos(id).subTodos.create({})
+              },
+
+              handleRemoveSubTodo(id, subId) {
+                this.props.interact.todos(id).subTodos(subId).remove()
               },
             }
 
-            export default createContainer(TodoList, () => ({
-              todos: '/api/v1/todos',
+            export default createContainer(TodoList, ({ id }) => ({
+              todos: {
+                base: '/api/v1/todos',
+                item: `/${id}`,
+                subs: ({ id }) => ({
+                  subTodos: {
+                    base: '/sub_todos',
+                    item: `/${id}`,
+                  },
+                }),
+              },
             }))
       
-      +space    
-      
-      
-      +space    
+      //- +space    
 
       
-      a.btn.btn-md.btn-primary(href="/guides_subresources.html") Next: Subresources
+      //- a.btn.btn-md.btn-primary(href="/guides_custom_interfaces.html") Next: Custom Interfaces
           
       +space    
       +space    

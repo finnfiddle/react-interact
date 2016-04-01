@@ -126,11 +126,11 @@ block content
                 return (
                   <ul>
                     {this.props.todos.map(todo => (
-                      <li>
+                      <li key={todo.id}>
                         {todo.title}
                         <ul>
                           {todo.subTodos.map(subTodo => (
-                            <li>{subTodo.title}</li>
+                            <li key={subTodo.id}>{subTodo.title}</li>
                           ))}
                         </ul>
                         <a 
@@ -145,7 +145,7 @@ block content
               },
 
               handleAddSubTodo(id) {
-                this.props.interact.todos.select(id).subTodos.create({})
+                this.props.interact.todos(id).subTodos.create({})
               },
             }
 
@@ -164,15 +164,16 @@ block content
       
       
       +space
-      a.btn.btn-md.btn-primary(href=uri_prefix+"/.html") Subresources in Depth
+      a.btn.btn-md.btn-primary(href=uri_prefix+"/guides_subresources.html") Subresources in Depth
       
-      #custom_agents
+      #custom_interfaces
         +space
-      h2 Custom Agents
-      h3 Example
+      h2 Custom Interfaces
+      p More info coming soon...
+      //- h3 Example
       
-      +space
-      a.btn.btn-md.btn-primary(href=uri_prefix+"/.html") Custom Agents in Depth
+      //- +space
+      //- a.btn.btn-md.btn-primary(href=uri_prefix+"/.html") Custom Interfaces in Depth
       
       +space
       +space

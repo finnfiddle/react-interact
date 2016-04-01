@@ -2,20 +2,20 @@
 <html lang="en">
   <head>
     <title>Interact</title>
-    <link rel="stylesheet" href="/react-interact//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
-    <link rel="stylesheet" href="/react-interact/css/main.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
   <body>
     <nav class="navbar navbar-default">
       <div class="container-fluid">
-        <div class="navbar-header"><a href="/react-interact/" class="navbar-brand">Interact</a></div>
+        <div class="navbar-header"><a href="/" class="navbar-brand">Interact</a></div>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="/react-interact/">Home</a></li>
-          <li><a href="/react-interact/guides.html">Guides</a></li>
-          <li><a href="/react-interact/docs.html">Docs</a></li>
-          <li><a href="/react-interact">Github</a></li>
+          <li><a href="/">Home</a></li>
+          <li><a href="/guides.html">Guides</a></li>
+          <li><a href="/docs.html">Docs</a></li>
+          <li><a href="">Github</a></li>
         </ul>
       </div>
     </nav>
@@ -73,7 +73,7 @@ export default createContainer(TodoList, () =&gt; ({
               <h4>Result</h4>
               <p>Laundry, Weights, Stroke the cat,</p>
             </div>
-          </div><br/><br/><a href="/react-interact/guides_containers.html" class="btn btn-md btn-primary">Containers in Depth</a>
+          </div><br/><br/><a href="/guides_containers.html" class="btn btn-md btn-primary">Containers in Depth</a>
           <div id="mutations"><br/><br/>
           </div>
           <h2>Mutations</h2>
@@ -102,7 +102,7 @@ class TodoList extends Component {
 export default createContainer(TodoList, () =&gt; ({
   todos: '/api/v1/todos',
 }))
-</code></pre><br/><br/><a href="/react-interact/guides_mutations.html" class="btn btn-md btn-primary">Mutations in Depth</a>
+</code></pre><br/><br/><a href="/guides_mutations.html" class="btn btn-md btn-primary">Mutations in Depth</a>
           <div id="subresources"><br/><br/>
           </div>
           <h2>Subresources</h2>
@@ -117,11 +117,11 @@ class TodoList extends Component {
     return (
       &lt;ul&gt;
         {this.props.todos.map(todo =&gt; (
-          &lt;li&gt;
+          &lt;li key={todo.id}&gt;
             {todo.title}
             &lt;ul&gt;
               {todo.subTodos.map(subTodo =&gt; (
-                &lt;li&gt;{subTodo.title}&lt;/li&gt;
+                &lt;li key={subTodo.id}&gt;{subTodo.title}&lt;/li&gt;
               ))}
             &lt;/ul&gt;
             &lt;a 
@@ -136,7 +136,7 @@ class TodoList extends Component {
   },
 
   handleAddSubTodo(id) {
-    this.props.interact.todos.select(id).subTodos.create({})
+    this.props.interact.todos(id).subTodos.create({})
   },
 }
 
@@ -153,11 +153,11 @@ export default createContainer(TodoList, ({ id }) =&gt; ({
   },
 }))
 
-</code></pre><br/><br/><a href="/react-interact/.html" class="btn btn-md btn-primary">Subresources in Depth</a>
-          <div id="custom_agents"><br/><br/>
+</code></pre><br/><br/><a href="/guides_subresources.html" class="btn btn-md btn-primary">Subresources in Depth</a>
+          <div id="custom_interfaces"><br/><br/>
           </div>
-          <h2>Custom Agents</h2>
-          <h3>Example</h3><br/><br/><a href="/react-interact/.html" class="btn btn-md btn-primary">Custom Agents in Depth</a><br/><br/><br/><br/><br/><br/>
+          <h2>Custom Interfaces</h2>
+          <p>More info coming soon...</p><br/><br/><br/><br/><br/><br/>
         </div>
       </div>
     </div>

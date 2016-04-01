@@ -5,7 +5,9 @@
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:prod": "gulp prod"
+    "build:prod": "gulp prod",
+    "lint": "jshint .",
+    "validate": "npm ls"
   },
   "repository": {
     "type": "git",
@@ -23,5 +25,10 @@
     "gulp-jade": "^1.1.0",
     "gulp-less": "^3.0.5",
     "gulp-rename": "^1.2.2"
-  }
+  },
+  "pre-commit": [
+    "lint",
+    "validate",
+    "test"
+  ]
 }

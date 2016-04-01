@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <title>Interact</title>
-    <link rel="stylesheet" href="/react-interact//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
-    <link rel="stylesheet" href="/react-interact/css/main.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
@@ -25,9 +25,9 @@
           </div>
           <p>Reading data from the server is an important part of an application but when we want to add interactivity we need to be able to also mutate it.</p>
           <p>Interact gives us the power to perform CRUD operations on our resources defined by our containers by passing a prop <code>interact</code>&nbsp;to the wrapped component.</p>
-          <p>The <code>interact</code>&nbsp;prop takes 3 arguments. First is the name/key of the resource that we defined in our container, second is the operation to be performed (read, update, create, remove, list), and the third is an object of parameters for the request like item <code>id</code>, <code>payload</code>, etc...</p>
-          <p>Read the docs for the full list of available options <a href="">here</a>.</p>
+          <p>The <code>interact</code>&nbsp;prop exposes a fluent API where resources can be mutated and read using CRUD operations (read, update, create, remove, list).</p>
           <h3>Create</h3>
+          <p>In the below example a new Todo is created when we click the Add Todo button.</p>
           <pre><code class="javascript">import React, { Component } from 'react'
 import { createContainer } from 'react-interact'
 
@@ -54,6 +54,7 @@ export default createContainer(TodoList, () =&gt; ({
 }))
 </code></pre><br/><br/>
           <h3>Update</h3>
+          <p>In this example we update/toggle the <code>done</code>&nbsp;property of the clicked Todo.</p>
           <pre><code class="javascript">import React, { Component } from 'react'
 import { createContainer } from 'react-interact'
 
@@ -63,7 +64,7 @@ class TodoList extends Component {
     return (
       &lt;ul&gt;
         {this.props.todos.map(todo =&gt; {
-          const onClick = handleUpdateTodo.bind(this, {
+          const onClick = this.handleUpdateTodo.bind(this, {
             id: todo.id,
             payload: {
               done: !todo.done,
@@ -71,7 +72,7 @@ class TodoList extends Component {
           })
           
           return (
-            &lt;li&gt;
+            &lt;li key={todo.id}&gt;
               &lt;a onClick={onClick}&gt;{todo.title}&lt;/a&gt;
             &lt;/li&gt;
           )
@@ -81,7 +82,7 @@ class TodoList extends Component {
   },
 
   handleUpdateTodo({id, payload}) {
-    this.props.interact.todos.select(id).update(payload)
+    this.props.interact.todos(id).update(payload)
   },
 }
 
@@ -89,7 +90,8 @@ export default createContainer(TodoList, () =&gt; ({
   todos: '/api/v1/todos',
 }))
 </code></pre><br/><br/>
-          <h3>Delete</h3>
+          <h3>Remove</h3>
+          <p>This example shows how to remove a Todo when we click it.</p>
           <pre><code class="javascript">import React, { Component } from 'react'
 import { createContainer } from 'react-interact'
 
@@ -99,10 +101,10 @@ class TodoList extends Component {
     return (
       &lt;ul&gt;
         {this.props.todos.map(todo =&gt; {
-          const onClick = handleRemoveTodo.bind(this, todo.id)
+          const onClick = this.handleRemoveTodo.bind(this, todo.id)
           
           return (
-            &lt;li&gt;
+            &lt;li key={todo.id}&gt;
               &lt;a onClick={onClick}&gt;{todo.title}&lt;/a&gt;
             &lt;/li&gt;
           )
@@ -112,7 +114,7 @@ class TodoList extends Component {
   },
 
   handleRemoveTodo(id) {
-    this.props.interact.todos.select(id).remove()
+    this.props.interact.todos(id).remove()
   },
 }
 
@@ -120,7 +122,45 @@ export default createContainer(TodoList, () =&gt; ({
   todos: '/api/v1/todos',
 }))
 </code></pre><br/><br/>
-          <h3>Callbacks</h3><br/><br/><a href="/guides_subresources.html" class="btn btn-md btn-primary">Next: Subresources</a><br/><br/><br/><br/><br/><br/>
+          <h3>Callbacks</h3>
+          <p>What happens when mutating one object has an effect on other items in the collection? If for example we change the position of an item in a list, and on the backend we also update the positions of other items in the list - these other changes would need to be synced with the frontend.</p>
+          <p>One way of doing this is sending another network request that retrieves the updated list of items. There are other ways but we will look at this way for illustration purposes.</p>
+          <pre><code class="javascript">import React, { Component } from 'react'
+import { createContainer } from 'react-interact'
+
+class TodoList extends Component {
+
+  render() {
+    return (
+      &lt;ul&gt;
+        {
+          this.props.todos
+            .sort((a, b) =&gt; a.position - b.position)
+            .map(todo =&gt; {
+              const onClick = this.handleMoveTodoToTop.bind(this, todo)
+              
+              return (
+                &lt;li key={todo.id}&gt;
+                  &lt;a onClick={onClick}&gt;{todo.title}&lt;/a&gt;
+                &lt;/li&gt;
+              )
+            })
+        }
+      &lt;/ul&gt;
+    )
+  },
+
+  handleMoveTodoToTop(todo) {
+    this.props.interact.todos(id).update({position: 0}, () =&gt; {
+      this.props.interact.todos.list()
+    })
+  },
+}
+
+export default createContainer(TodoList, () =&gt; ({
+  todos: '/api/v1/todos',
+}))
+</code></pre><br/><br/><br/><br/><br/><br/>
         </div>
       </div>
     </div>

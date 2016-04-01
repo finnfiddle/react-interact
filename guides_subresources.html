@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <title>Interact</title>
-    <link rel="stylesheet" href="/react-interact//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
-    <link rel="stylesheet" href="/react-interact/css/main.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
@@ -23,8 +23,8 @@
           <div class="page-header">
             <h1>Subresources</h1>
           </div>
-          <p>Reading data from the server is an important part of an application but when we want to add interactivity we need to be able to also mutate it.</p>
-          <h3>Create</h3>
+          <p>When defining our containers we can create subresources within resources. Subresources are defined in exactly the same way as resources and are placed in the <code>subs</code>&nbsp;key of the resource.</p>
+          <h3>Basic Example</h3>
           <pre><code class="javascript">import React, { Component } from 'react'
 import { createContainer } from 'react-interact'
 
@@ -32,26 +32,52 @@ class TodoList extends Component {
 
   render() {
     return (
-      &lt;div&gt;
-        {this.props.todos.map(todo =&gt; `${todo.title}, `)}
-        &lt;a onClick={this.handleAddTodo.bind(this)}&gt;Add Todo&lt;/a&gt;
-      &lt;/div&gt;
+      &lt;ul&gt;
+        {this.props.todos.map(todo =&gt; (
+          &lt;li key={todo.id}&gt;
+            {todo.title}
+            &lt;ul&gt;
+              {todo.subTodos.map(subTodo =&gt; (
+                &lt;li 
+                  key={subTodo.id}
+                  onClick={this.handleRemoveSubTodo.bind(this, todo.id, subTodo.id)}
+                &gt;{subTodo.title}&lt;/li&gt;
+              ))}
+            &lt;/ul&gt;
+            &lt;a 
+              onClick={this.handleAddSubTodo.bind(this, todo.id)}
+            &gt;
+              Add SubTodo
+            &lt;/a&gt;
+          &lt;/li&gt;
+        )}
+      &lt;/ul&gt;
     )
   },
 
-  handleAddTodo() {
-    this.props.interact('todos', 'create', {
-      payload: {
-        title: 'New Todo',
-      },
-    })
+  handleAddSubTodo(id) {
+    this.props.interact.todos(id).subTodos.create({})
+  },
+
+  handleRemoveSubTodo(id, subId) {
+    this.props.interact.todos(id).subTodos(subId).remove()
   },
 }
 
-export default createContainer(TodoList, () =&gt; ({
-  todos: '/api/v1/todos',
+export default createContainer(TodoList, ({ id }) =&gt; ({
+  todos: {
+    base: '/api/v1/todos',
+    item: `/${id}`,
+    subs: ({ id }) =&gt; ({
+      subTodos: {
+        base: '/sub_todos',
+        item: `/${id}`,
+      },
+    }),
+  },
 }))
-</code></pre><br/><br/><br/><br/><a href="/guides_subresources.html" class="btn btn-md btn-primary">Next: Subresources</a><br/><br/><br/><br/><br/><br/>
+</code></pre>
+          <br/><br/><br/><br/><br/><br/>
         </div>
       </div>
     </div>

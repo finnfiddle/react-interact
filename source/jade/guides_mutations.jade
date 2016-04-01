@@ -17,18 +17,11 @@ block content
         
       p The 
         code interact
-        | &nbsp;prop takes 3 arguments. First is the name/key of the resource that we defined in our container, second is the operation to be performed (read, update, create, remove, list), and the third is an object of parameters for the request like item 
-        code id
-        | , 
-        code payload
-        | , etc...
-        
-      p Read the docs for the full list of available options 
-        a(href="") here
-        | .
+        | &nbsp;prop exposes a fluent API where resources can be mutated and read using CRUD operations (read, update, create, remove, list).
 
 
       h3 Create
+      p In the below example a new Todo is created when we click the Add Todo button.
       pre
         code.javascript
           :escape
@@ -61,6 +54,9 @@ block content
       
       
       h3 Update
+      p In this example we update/toggle the 
+        code done
+        | &nbsp;property of the clicked Todo.
       pre
         code.javascript
           :escape
@@ -73,7 +69,7 @@ block content
                 return (
                   <ul>
                     {this.props.todos.map(todo => {
-                      const onClick = handleUpdateTodo.bind(this, {
+                      const onClick = this.handleUpdateTodo.bind(this, {
                         id: todo.id,
                         payload: {
                           done: !todo.done,
@@ -81,7 +77,7 @@ block content
                       })
                       
                       return (
-                        <li>
+                        <li key={todo.id}>
                           <a onClick={onClick}>{todo.title}</a>
                         </li>
                       )
@@ -91,7 +87,7 @@ block content
               },
 
               handleUpdateTodo({id, payload}) {
-                this.props.interact.todos.select(id).update(payload)
+                this.props.interact.todos(id).update(payload)
               },
             }
 
@@ -102,7 +98,8 @@ block content
       +space    
       
       
-      h3 Delete
+      h3 Remove
+      p This example shows how to remove a Todo when we click it.
       pre
         code.javascript
           :escape
@@ -115,10 +112,10 @@ block content
                 return (
                   <ul>
                     {this.props.todos.map(todo => {
-                      const onClick = handleRemoveTodo.bind(this, todo.id)
+                      const onClick = this.handleRemoveTodo.bind(this, todo.id)
                       
                       return (
-                        <li>
+                        <li key={todo.id}>
                           <a onClick={onClick}>{todo.title}</a>
                         </li>
                       )
@@ -128,7 +125,7 @@ block content
               },
 
               handleRemoveTodo(id) {
-                this.props.interact.todos.select(id).remove()
+                this.props.interact.todos(id).remove()
               },
             }
 
@@ -139,11 +136,52 @@ block content
       +space    
       
       h3 Callbacks
+      p What happens when mutating one object has an effect on other items in the collection? If for example we change the position of an item in a list, and on the backend we also update the positions of other items in the list - these other changes would need to be synced with the frontend.
       
-      +space    
+      p One way of doing this is sending another network request that retrieves the updated list of items. There are other ways but we will look at this way for illustration purposes.
+      
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
 
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <ul>
+                    {
+                      this.props.todos
+                        .sort((a, b) => a.position - b.position)
+                        .map(todo => {
+                          const onClick = this.handleMoveTodoToTop.bind(this, todo)
+                          
+                          return (
+                            <li key={todo.id}>
+                              <a onClick={onClick}>{todo.title}</a>
+                            </li>
+                          )
+                        })
+                    }
+                  </ul>
+                )
+              },
+
+              handleMoveTodoToTop(todo) {
+                this.props.interact.todos(id).update({position: 0}, () => {
+                  this.props.interact.todos.list()
+                })
+              },
+            }
+
+            export default createContainer(TodoList, () => ({
+              todos: '/api/v1/todos',
+            }))
+            
+      //- +space    
       
-      a.btn.btn-md.btn-primary(href="/guides_subresources.html") Next: Subresources
+      //- a.btn.btn-md.btn-primary(href="/guides_subresources.html") Next: Subresources
           
       +space    
       +space    
