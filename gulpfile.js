@@ -15,7 +15,7 @@ var less = require('gulp-less');
 //   fs.copy(path.join(paths.src, 'fonts'), path.join(paths.dist, 'fonts'), done);
 // });
 
-gulp.task('connect', function(done) {
+gulp.task('connect', function () {
   var express = require('express');
   var port = 8082;
   var app = express();
@@ -24,22 +24,22 @@ gulp.task('connect', function(done) {
   app.use('', express.static(__dirname));
 
   app.listen(port);
-  console.log("server started on port " + port);
+  console.log('server started on port ' + port);
 });
 
-const j = require('jade')
-j.filters.escape = function( block ) {
+var j = require('jade');
+j.filters.escape = function (block) {
   return block
     // .replace( /&/g, '&amp;'  )
-    .replace( /</g, '&lt;'   )
-    .replace( />/g, '&gt;'   );
-    // .replace( /"/g, '&quot;' )
-    // .replace( /#/g, '&#35;'  )
-    // .replace( /\\/g, '\\\\'  )
-    // .replace( /\n/g, '\\n'   );
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  // .replace( /'/g, '&quot;' )
+  // .replace( /#/g, '&#35;'  )
+  // .replace( /\\/g, '\\\\'  )
+  // .replace( /\n/g, '\\n'   );
 };
 
-gulp.task('jade', function(done){
+gulp.task('jade', function (done) {
   gulp
     .src('source/jade/*.jade')
     .pipe(jade({
@@ -47,13 +47,13 @@ gulp.task('jade', function(done){
       jade: j,
       locals: {
         uri_prefix: '',
-      }
+      },
     }))
     .pipe(gulp.dest(''))
     .on('end', done);
 });
 
-gulp.task('jade:prod', function(done){
+gulp.task('jade:prod', function (done) {
   gulp
     .src('source/jade/*.jade')
     .pipe(jade({
@@ -61,13 +61,13 @@ gulp.task('jade:prod', function(done){
       jade: j,
       locals: {
         uri_prefix: '/react-interact',
-      }
+      },
     }))
     .pipe(gulp.dest(''))
     .on('end', done);
 });
 
-gulp.task('less', function(done) {
+gulp.task('less', function (done) {
   gulp.src('source/less/main.less')
     .pipe(less())
     .pipe(rename('main.css'))
@@ -75,9 +75,9 @@ gulp.task('less', function(done) {
     .on('end', done);
 });
 
-gulp.task('watch', function() {
-	gulp.watch('**/*.less', ['less']);
-	gulp.watch('**/*.jade', ['jade']);
+gulp.task('watch', function () {
+  gulp.watch('**/*.less', ['less']);
+  gulp.watch('**/*.jade', ['jade']);
 });
 
 gulp.task('default', [
