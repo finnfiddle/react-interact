@@ -12,7 +12,7 @@ const VERBS_AS_METHODS = {
 
 export default (request) => new Promise((resolve, reject) => {
 
-  const { method } = request.resource[request.operationName]
+  const { method } = request.method
 
   const requestMethod = VERBS_AS_METHODS[method]
   let req = agent[requestMethod](request.uri)

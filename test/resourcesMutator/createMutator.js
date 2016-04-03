@@ -1,126 +1,48 @@
 import test from 'blue-tape'
 
 import agent from '../mock/agent'
+import RequestFactory from '../requestFactory'
 import { createMutator } from '../../source/resourcesMutator'
-import { getNormalizedResources } from '../../source/utils'
+import { normalizeResource } from '../../source/utils'
 
 const BASE = '/test'
 const ITEM_URI = '/test_id'
+const SUB_BASE = '/sub_test'
+const SUB_ITEM_URI = '/sub_test_id'
 const KEY = 'testResource'
+const SUB_KEY = 'testSubResource'
 const PAYLOAD = {foo: 'bar'}
 const CALLBACK = () => ({fooo: 'bar'})
 const PROPS = {}
 
-const getExpected = (operationName, itemUri, payload) => {
-  const result = {
-    request: {
-      uri: `${BASE}${['update', 'remove', 'read']
-        .indexOf(operationName) > -1 ? itemUri : ''}`,
-      operationName,
-      resource: {
-        defaultOperation: 'list',
-        base: BASE,
-        list: {
-          method: 'GET',
-          uri: '',
-        },
-        create: {
-          method: 'POST',
-          uri: '',
-        },
-        select: {
-          uri: itemUri,
-        },
-        read: {
-          method: 'GET',
-          uri: itemUri,
-        },
-        update: {
-          method: 'PUT',
-          uri: itemUri,
-        },
-        patch: {
-          method: 'PATCH',
-          uri: itemUri,
-        },
-        remove: {
-          method: 'DELETE',
-          uri: itemUri,
-        },
-        name: KEY,
-      },
-      callback: CALLBACK,
-    },
-    response: {
-      body: {
-        uri: `${BASE}${['update', 'remove', 'read']
-          .indexOf(operationName) > -1 ? itemUri : ''}`,
-        operationName,
-        resource: {
-          defaultOperation: 'list',
-          base: BASE,
-          list: {
-            method: 'GET',
-            uri: '',
-          },
-          create: {
-            method: 'POST',
-            uri: '',
-          },
-          select: {
-            uri: itemUri,
-          },
-          read: {
-            method: 'GET',
-            uri: itemUri,
-          },
-          update: {
-            method: 'PUT',
-            uri: itemUri,
-          },
-          patch: {
-            method: 'PATCH',
-            uri: itemUri,
-          },
-          remove: {
-            method: 'DELETE',
-            uri: itemUri,
-          },
-          name: KEY,
-        },
-        callback: CALLBACK,
-      },
-    },
-  }
-
-  if (typeof payload !== 'undefined') {
-    result.request.payload = result.response.body.payload = payload
-  }
-
-  return result
-}
-
-const getResources = ({ id, props }) => {
-  return getNormalizedResources({id, props}, () => ({
-    testResource: BASE,
-  }))
+const resources = {
+  [KEY]: normalizeResource(BASE),
 }
 
 test('createMutator: CREATE', t => {
 
-  const expected = getExpected('create', `/${undefined}`, PAYLOAD)
+  const expected = RequestFactory({
+    operationName: 'create',
+    payload: PAYLOAD,
+    baseUri: BASE,
+    name: KEY,
+  })
 
   const onResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator({
-    agent,
-    key: KEY,
-    getResources,
-    props: PROPS,
-    onResponse,
-  })
+  const mutator = createMutator.call(
+    {
+      agent,
+      resources,
+      props: PROPS,
+      onResponse,
+    },
+    {
+      key: KEY,
+    }
+  )
 
   return mutator.create(PAYLOAD, CALLBACK)
 
@@ -128,84 +50,156 @@ test('createMutator: CREATE', t => {
 
 test('createMutator: UPDATE', t => {
 
-  const itemUri = 123
-  const expected = getExpected('update', `/${itemUri}`, PAYLOAD)
+  const expected = RequestFactory({
+    operationName: 'update',
+    itemUri: ITEM_URI,
+    payload: PAYLOAD,
+    baseUri: BASE,
+    name: KEY,
+  })
 
   const onResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator({
-    agent,
-    key: KEY,
-    getResources,
-    props: PROPS,
-    onResponse,
-  })
+  const mutator = createMutator.call(
+    {
+      agent,
+      resources,
+      props: PROPS,
+      onResponse,
+    },
+    {
+      key: KEY,
+    }
+  )
 
-  return mutator(itemUri).update(PAYLOAD, CALLBACK)
+  return mutator(ITEM_URI.slice(1)).update(PAYLOAD, CALLBACK)
 
 })
 
 test('createMutator: READ', t => {
 
   const itemUri = 123
-  const expected = getExpected('read', `/${itemUri}`)
+  const expected = RequestFactory({
+    operationName: 'read',
+    itemUri: ITEM_URI,
+    baseUri: BASE,
+    name: KEY,
+  })
 
   const onResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator({
-    agent,
-    key: KEY,
-    getResources,
-    props: PROPS,
-    onResponse,
-  })
+  const mutator = createMutator.call(
+    {
+      agent,
+      resources,
+      props: PROPS,
+      onResponse,
+    },
+    {
+      key: KEY,
+    }
+  )
 
-  return mutator(itemUri).read(CALLBACK)
+  return mutator(ITEM_URI.slice(1)).read(CALLBACK)
 
 })
 
 test('createMutator: REMOVE', t => {
 
-  const itemUri = 123
-  const expected = getExpected('remove', `/${itemUri}`)
+  const expected = RequestFactory({
+    operationName: 'remove',
+    itemUri: ITEM_URI,
+    baseUri: BASE,
+    name: KEY,
+  })
 
   const onResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator({
-    agent,
-    key: KEY,
-    getResources,
-    props: PROPS,
-    onResponse,
-  })
+  const mutator = createMutator.call(
+    {
+      agent,
+      resources,
+      props: PROPS,
+      onResponse,
+    },
+    {
+      key: KEY,
+    }
+  )
 
-  return mutator(itemUri).remove(CALLBACK)
+  return mutator(ITEM_URI.slice(1)).remove(CALLBACK)
 
 })
 
 test('createMutator: LIST', t => {
 
-  const itemUri = 123
-  const expected = getExpected('list', `/${undefined}`)
+  const expected = RequestFactory({
+    operationName: 'list',
+    baseUri: BASE,
+    name: KEY,
+  })
 
   const onResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator({
-    agent,
-    key: KEY,
-    getResources,
-    props: PROPS,
-    onResponse,
-  })
+  const mutator = createMutator.call(
+    {
+      agent,
+      resources,
+      props: PROPS,
+      onResponse,
+    },
+    {
+      key: KEY,
+    }
+  )
 
   return mutator.list(CALLBACK)
+
+})
+
+test('createMutator: SUB CREATE', t => {
+
+  const expected = RequestFactory({
+    operationName: 'create',
+    payload: PAYLOAD,
+    baseUri: `${BASE}${ITEM_URI}${SUB_BASE}`,
+    name: KEY,
+  })
+
+  const onResponse = (actual) => {
+    t.deepEqual(actual, expected)
+  }
+
+  const resource = normalizeResource({
+    base: BASE,
+    item: ITEM_URI,
+    subs: {
+      [SUB_KEY]: normalizeResource(SUB_BASE),
+    },
+  })
+
+  const mutator = createMutator.call(
+    {
+      agent,
+      resources: {
+        [KEY]: resource,
+      },
+      props: PROPS,
+      onResponse,
+    },
+    {
+      key: KEY,
+    }
+  )
+
+  return mutator(ITEM_URI.slice(1)).testSubResource.create(PAYLOAD, CALLBACK)
 
 })

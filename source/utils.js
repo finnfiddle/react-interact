@@ -1,9 +1,12 @@
 import { Promise } from 'es6-promise'
 import cloneDeep from 'lodash.clonedeep'
 import findIndex from 'lodash.findindex'
+import get from 'lodash.get'
 import { map as asyncMap } from 'nimble'
 
 import { OPERATIONS, RESOURCE_DEFAULTS } from './constants'
+
+const RE = /\$\{(.[^}]*)\}/
 
 const isSet = (val) => typeof val !== 'undefined' && val !== null
 const isString = (val) => typeof val === 'string'
@@ -29,14 +32,31 @@ const normalizeOperation = ({ resource, operationName, defaultMethod }) => {
   return result
 }
 
-const normalizeResource = (resourceData, params) => {
+const getUri = function ({ operationName, id, props }) {
+  let uri = this[operationName || this.defaultOperation].uri
+  let match
+  const params = {id, props}
+  const parentBase = this.parentBase || ''
+
+  while ((match = RE.exec(uri)) !== null) {
+    uri = uri.replace(match[0], get(params, match[1]))
+  }
+
+  return `${parentBase}${this.base || ''}${uri}`
+}
+
+const getMethod = function ({ operationName }) {
+  return this[operationName || this.defaultOperation].method
+}
+
+const normalizeResource = (resourceData) => {
   let resource = {}
   let normalizedResourceData
 
   if (isString(resourceData)) {
     normalizedResourceData = {
       base: resourceData,
-      item: `/${params.id}`,
+      item: '/${id}',
     }
   }
   else {
@@ -59,7 +79,6 @@ const normalizeResource = (resourceData, params) => {
   })
 
   if (isSet(data.item)) {
-    resource.select = {uri: data.item}
     resource.read = {method: 'GET', uri: data.item}
     resource.update = {method: 'PUT', uri: data.item}
     resource.patch = {method: 'PATCH', uri: data.item}
@@ -75,6 +94,13 @@ const normalizeResource = (resourceData, params) => {
       })
     })
   }
+
+  if (isSet(data.subs)) {
+    resource.subs = data.subs
+  }
+
+  resource.getUri = getUri.bind(resource)
+  resource.getMethod = getMethod.bind(resource)
 
   return resource
 }
@@ -100,7 +126,7 @@ const mergeResponse = ({ currentData, response, request }) => {
 
   return new Promise(resolve => {
     let data = cloneDeep(currentData)
-    const { resource, operationName } = request
+    const { resource, operationName } = request.meta
     const uid = resource.uid
     const { body } = response
 
@@ -125,24 +151,21 @@ const mergeResponse = ({ currentData, response, request }) => {
   })
 }
 
-const fetch = ({ params, getResources, agent }) => {
+const fetch = function () {
 
   let result = {}
-  let resources = getResources(params)
 
   return new Promise((resolve, reject) => {
-    asyncMap(resources, (resource, key, next) => {
-      const operationName = resource.defaultOperation
-
-      agent({
-        uri: `${resource.base}${resource[operationName].uri}`,
-        resource,
-        operationName,
-      })
-      .then(({ response }) => {
-        result[key] = response.body
-        next(null)
-      })
+    asyncMap(this.resources, (resource, key, next) => {
+      this
+        .agent.call(this, {
+          uri: resource.getUri({}),
+          method: resource.getMethod({}),
+        })
+        .then(({ response }) => {
+          result[key] = response.body
+          next(null)
+        })
 
     }, (err) => {
       if (err) reject(err)
@@ -157,6 +180,8 @@ export default {
   isString,
   isFunction,
   fetch,
+  getUri,
+  getMethod,
   normalizeResource,
   normalizeOperation,
   addNamesToResources,

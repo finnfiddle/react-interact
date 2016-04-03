@@ -13,16 +13,17 @@ import ResourcesMutator from './resourcesMutator'
 
 export default {
 
-  createContainer(WrappedElement, getResources, agent) {
+  createContainer(WrappedElement, resources, agent) {
     return stamp(React)
       .compose({
 
         init() {
           this.WrappedElement = WrappedElement
-          this.getResources = params => getNormalizedResources(
-            params,
-            getResources
-          )
+
+          for (let key in resources) {
+            this.resources[key] = normalizeResource(resources[key])
+          }
+
           this.agent = agent || DefaultAgent
         },
 
@@ -48,12 +49,12 @@ export default {
               <Wrapped
                 {...this.state}
                 {...this.props}
-                interact={::this.requestHandler()}
+                interact={this.requestHandler()}
               />
             )
           }
           else {
-            // TO DO: loading component
+            // TODO: loading component
             result = (
               <div />
             )
@@ -63,19 +64,14 @@ export default {
         },
 
         requestHandler() {
-          return ResourcesMutator({
-            agent: this.agent,
-            getResources: this.getResources,
-            props: this.props,
-            onResponse: this._handleResponse.bind(this),
-          })
+          return ResourcesMutator.call(this)
         },
 
-        _handleResponse({
+        handleResponse({
           request,
           response,
         }) {
-          const { resource } = request
+          const { resource } = request.meta
 
           if (isFunction(request.callback)) {
             let clonedResource = cloneDeep(this.state[resource.name])
@@ -94,12 +90,7 @@ export default {
         },
 
         fetch({ props }) {
-          fetch({
-            params: {props},
-            agent: this.agent,
-            getResources: this.getResources,
-          })
-          .then(result => {
+          fetch.call(this).then(result => {
             this.setState(Object.assign({}, result, {_hasFetched: true}))
           })
         },

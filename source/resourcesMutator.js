@@ -1,101 +1,116 @@
+import { isSet, getNormalizedResources } from './utils'
+
 let ResourcesMutator
 
-export let createMutator = ({
-  agent,
+export function createMutator({
   key,
-  getResources,
-  props,
   base,
-  onResponse,
-}) => {
+}) {
 
-  const baseUri = base || ''
-  let resource = getResources({props})[key]
+  let resource = this.resources[key]
 
   let Mutator = (id) => {
 
-    let selectedResource = getResources({id, props})[key]
+    let resource = this.resources[key]
 
     let subMutator = {
 
-      update: (payload, callback) => agent({
-        uri: `${baseUri}${selectedResource.base}${selectedResource.update.uri}`,
-        operationName: 'update',
-        resource: selectedResource,
+      update: (payload, callback) => this.agent.call(this, {
+        uri: resource.getUri({operationName: 'update', props: this.props, id}),
+        method: resource.getMethod({operationName: 'update'}),
         payload,
         callback,
+        meta: {
+          operationName: 'update',
+          resource,
+        },
       })
-      .then(onResponse),
+      .then(this.handleResponse),
 
-      read: (callback) => agent({
-        uri: `${baseUri}${selectedResource.base}${selectedResource.read.uri}`,
-        operationName: 'read',
-        resource: selectedResource,
+      read: (callback) => this.agent.call(this, {
+        uri: resource.getUri({operationName: 'read', props: this.props, id}),
+        method: resource.getMethod({operationName: 'read'}),
         callback,
+        meta: {
+          operationName: 'read',
+          resource,
+        },
       })
-      .then(onResponse),
+      .then(this.handleResponse),
 
-      remove: (callback) => agent({
-        uri: `${baseUri}${selectedResource.base}${selectedResource.remove.uri}`,
-        operationName: 'remove',
-        resource: selectedResource,
+      remove: (callback) => this.agent.call(this, {
+        uri: resource.getUri({operationName: 'remove', props: this.props, id}),
+        method: resource.getMethod({operationName: 'remove'}),
         callback,
+        meta: {
+          operationName: 'remove',
+          resource,
+        },
       })
-      .then(onResponse),
+      .then(this.handleResponse),
 
     }
 
-    for (let sk in resource.subs) {
-      subMutator[sk] = ResourcesMutator({
-        agent,
-        getResources: resource.subs,
-        props,
-        base: `${baseUri}${resource.base}${resource.select}`,
-        onResponse,
-      })
+    if (isSet(resource.subs)) {
+      for (let sk in resource.subs) {
+        subMutator[sk] = createMutator.call(
+          {
+            props: this.props,
+            resources: resource.subs,
+            agent: this.agent,
+            handleResponse: this.handleResponse,
+            parentBase: resource.getUri({
+              operationName: 'read',
+              props: this.props,
+              id,
+            }),
+          },
+          {
+            key: sk,
+          }
+        )
+      }
     }
 
     return subMutator
 
   }
 
-  Mutator.create = (payload, callback) => agent({
-    uri: `${baseUri}${resource.base}${resource.create.uri}`,
-    operationName: 'create',
-    resource,
+  Mutator.create = (payload, callback) => this.agent.call(this, {
+    uri: resource.getUri({operationName: 'create', props: this.props}),
+    method: resource.getMethod({operationName: 'create'}),
     payload,
     callback,
+    meta: {
+      operationName: 'create',
+      resource,
+    },
   })
-  .then(onResponse)
+  .then(this.handleResponse)
 
-  Mutator.list = (callback) => agent({
-    uri: `${baseUri}${resource.base}${resource.list.uri}`,
-    operationName: 'list',
-    resource,
+  Mutator.list = (callback) => this.agent.call(this, {
+    uri: resource.getUri({operationName: 'list', props: this.props}),
+    method: resource.getMethod({operationName: 'list'}),
     callback,
+    meta: {
+      operationName: 'list',
+      resource,
+    },
   })
-  .then(onResponse)
+  .then(this.handleResponse)
 
   return Mutator
 
 }
 
-export default ({getResources, props, base, agent, onResponse}) => {
-
-  const baseUri = base || ''
+export default function() {
 
   let mutator = {}
-  let resources = getResources({props})
 
-  for (let key in resources) {
+  for (let key in this.resources) {
 
     mutator[key] = createMutator({
-      agent,
       key,
-      getResources,
-      props,
-      baseUri,
-      onResponse,
     })
 
   }

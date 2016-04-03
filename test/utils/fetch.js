@@ -1,38 +1,37 @@
 import _ from 'lodash'
 import test from 'blue-tape'
 
-import { fetch, getNormalizedResources } from '../../source/utils'
+import RequestFactory from '../requestFactory'
 import agent from '../mock/agent'
+import { fetch, normalizeResource } from '../../source/utils'
 
 const BASE = '/test'
 const ITEM_URI = '/test_id'
+const KEY = 'testResource'
 
-test('fetch: default', t => {
+test('fetch: default', function (t) {
 
-  const getResources = () => getNormalizedResources({id: ITEM_URI.slice(1)}, () => ({
-    testResource: BASE,
-  }))
+  const request = RequestFactory({
+    operationName: 'list',
+    baseUri: BASE,
+    itemUri: ITEM_URI,
+    name: KEY,
+  })
 
   const expected = {
-    testResource: {
+    [KEY]: {
       uri: BASE,
-      operationName: 'list',
-      resource: {
-        defaultOperation: 'list',
-        base: BASE,
-        list: { method: 'GET', uri: '' },
-        create: { method: 'POST', uri: '' },
-        select: { uri: ITEM_URI },
-        read: { method: 'GET', uri: ITEM_URI },
-        update: { method: 'PUT', uri: ITEM_URI },
-        patch: { method: 'PATCH', uri: ITEM_URI },
-        remove: { method: 'DELETE', uri: ITEM_URI },
-        name: 'testResource',
-      },
+      method: 'GET',
     },
-  };
+  }
 
-  return fetch({params: {}, getResources, agent})
-    .then(actual => t.deepEqual(actual, expected))
+  const resources = {
+    [KEY]: normalizeResource(BASE),
+  }
+
+  return fetch.call({resources, agent})
+    .then(actual => {
+      t.deepEqual(actual, expected)
+    })
 
 })

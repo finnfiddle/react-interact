@@ -16,9 +16,11 @@ test('mergeResponse: CREATE', t => {
   }
 
   const request = {
-    operationName: 'create',
-    resource: {
-      uid: 'id',
+    meta: {
+      operationName: 'create',
+      resource: {
+        uid: 'id',
+      },
     },
   }
 
@@ -42,9 +44,11 @@ test('mergeResponse: UPDATE', t => {
   }
 
   const request = {
-    operationName: 'update',
-    resource: {
-      uid: 'id',
+    meta: {
+      operationName: 'update',
+      resource: {
+        uid: 'id',
+      },
     },
   }
 
@@ -67,9 +71,11 @@ test('mergeResponse: REMOVE', t => {
   }
 
   const request = {
-    operationName: 'remove',
-    resource: {
-      uid: 'id',
+    meta: {
+      operationName: 'remove',
+      resource: {
+        uid: 'id',
+      },
     },
   }
 

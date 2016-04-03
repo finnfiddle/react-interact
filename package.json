@@ -1,7 +1,7 @@
 {
   "name": "react-interact",
   "description": "Declarative REST data fetching for React",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "build/index.js",
   "scripts": {
     "init": "rimraf .validate.json && rimraf .jshintrc",
@@ -48,6 +48,7 @@
     "jsdom-global": "1.6.2",
     "lodash.clonedeep": "^4.3.1",
     "lodash.findindex": "^4.2.1",
+    "lodash.get": "^4.2.0",
     "lodash.reject": "^4.2.1",
     "nimble": "0.0.2",
     "node-libs-browser": "^0.5.2",
@@ -59,7 +60,6 @@
     "react-shallow-testutils": "^1.0.0",
     "react-stamp": "^0.5.0",
     "rimraf": "^2.4.2",
-    "sinon": "^1.17.3",
     "stampit": "^2.1.1",
     "superagent": "^1.8.1",
     "webpack": "^1.11.0"
