@@ -182,7 +182,10 @@ test('createMutator: SUB CREATE', t => {
     base: BASE,
     item: ITEM_URI,
     subs: {
-      [SUB_KEY]: normalizeResource(SUB_BASE),
+      [SUB_KEY]: normalizeResource({
+        base: SUB_BASE,
+        item: SUB_ITEM_URI,
+      }),
     },
   })
 

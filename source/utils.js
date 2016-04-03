@@ -151,7 +151,7 @@ const mergeResponse = ({ currentData, response, request }) => {
   })
 }
 
-const fetch = function () {
+const fetch = function ({ props }) {
 
   let result = {}
 
@@ -159,7 +159,7 @@ const fetch = function () {
     asyncMap(this.resources, (resource, key, next) => {
       this
         .agent.call(this, {
-          uri: resource.getUri({}),
+          uri: resource.getUri({props}),
           method: resource.getMethod({}),
         })
         .then(({ response }) => {

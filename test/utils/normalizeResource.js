@@ -1,6 +1,6 @@
 import test from 'blue-tape'
 
-import { normalizeResource, getUri, getMethod } from '../../source/utils'
+import { normalizeResource } from '../../source/utils'
 
 test('normalizeResource: from baseUri string', t => {
   t.plan(1)

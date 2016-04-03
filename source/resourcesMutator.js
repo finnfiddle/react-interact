@@ -1,17 +1,10 @@
-import { isSet, getNormalizedResources } from './utils'
+import { isSet } from './utils'
 
-let ResourcesMutator
-
-export function createMutator({
-  key,
-  base,
-}) {
+export function createMutator({ key }) {
 
   let resource = this.resources[key]
 
   let Mutator = (id) => {
-
-    let resource = this.resources[key]
 
     let subMutator = {
 

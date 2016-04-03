@@ -1,6 +1,6 @@
 import test from 'blue-tape'
 
-import ResourcesMutator from '../../source/resourcesMutator'
+// import ResourcesMutator from '../../source/resourcesMutator'
 
 test('ResourcesMutator', t => {
   t.plan(0)

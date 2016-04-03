@@ -6,7 +6,7 @@ import {
   isFunction,
   fetch,
   mergeResponse,
-  getNormalizedResources,
+  normalizeResource,
 } from './utils'
 import DefaultAgent from './defaultAgent'
 import ResourcesMutator from './resourcesMutator'
@@ -90,7 +90,7 @@ export default {
         },
 
         fetch({ props }) {
-          fetch.call(this).then(result => {
+          fetch.call(this, {props}).then(result => {
             this.setState(Object.assign({}, result, {_hasFetched: true}))
           })
         },

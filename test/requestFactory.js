@@ -6,8 +6,9 @@ const getUri = ({ baseUri, operationName, itemUri }) => {
 export default ({
   baseUri,
   operationName,
-  payload,
   itemUri,
+  subs,
+  callback,
   name,
 }) => {
 
