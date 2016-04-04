@@ -46,17 +46,18 @@ export function createMutator({ key }) {
 
     if (isSet(resource.subs)) {
       for (let sk in resource.subs) {
+        resource.subs[sk].parentBase = resource.getUri({
+          operationName: 'read',
+          props: this.props,
+          id,
+        })
+
         subMutator[sk] = createMutator.call(
           {
             props: this.props,
             resources: resource.subs,
             agent: this.agent,
             handleResponse: this.handleResponse.bind(this),
-            parentBase: resource.getUri({
-              operationName: 'read',
-              props: this.props,
-              id,
-            }),
           },
           {
             key: sk,

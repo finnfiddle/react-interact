@@ -1,7 +1,6 @@
 import test from 'blue-tape'
 
 import agent from '../mock/agent'
-import RequestFactory from '../requestFactory'
 import { createMutator } from '../../source/resourcesMutator'
 import { normalizeResource } from '../../source/utils'
 
@@ -21,14 +20,22 @@ const resources = {
 
 test('createMutator: CREATE', t => {
 
-  const expected = RequestFactory({
-    operationName: 'create',
-    payload: PAYLOAD,
-    baseUri: BASE,
-    name: KEY,
-  })
+  let expected = {
+    response: {
+      body: {
+        callback: CALLBACK,
+        method: 'POST',
+        payload: PAYLOAD,
+        uri: `${BASE}`,
+        meta: {
+          operationName: 'create',
+          resource: resources[KEY],
+        },
+      },
+    },
+  }
 
-  const onResponse = (actual) => {
+  const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
@@ -37,7 +44,7 @@ test('createMutator: CREATE', t => {
       agent,
       resources,
       props: PROPS,
-      onResponse,
+      handleResponse,
     },
     {
       key: KEY,
@@ -50,15 +57,22 @@ test('createMutator: CREATE', t => {
 
 test('createMutator: UPDATE', t => {
 
-  const expected = RequestFactory({
-    operationName: 'update',
-    itemUri: ITEM_URI,
-    payload: PAYLOAD,
-    baseUri: BASE,
-    name: KEY,
-  })
+  let expected = {
+    response: {
+      body: {
+        callback: CALLBACK,
+        method: 'PUT',
+        payload: PAYLOAD,
+        uri: `${BASE}${ITEM_URI}`,
+        meta: {
+          operationName: 'update',
+          resource: resources[KEY],
+        },
+      },
+    },
+  }
 
-  const onResponse = (actual) => {
+  const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
@@ -67,7 +81,7 @@ test('createMutator: UPDATE', t => {
       agent,
       resources,
       props: PROPS,
-      onResponse,
+      handleResponse,
     },
     {
       key: KEY,
@@ -80,15 +94,21 @@ test('createMutator: UPDATE', t => {
 
 test('createMutator: READ', t => {
 
-  const itemUri = 123
-  const expected = RequestFactory({
-    operationName: 'read',
-    itemUri: ITEM_URI,
-    baseUri: BASE,
-    name: KEY,
-  })
+  let expected = {
+    response: {
+      body: {
+        callback: CALLBACK,
+        method: 'GET',
+        uri: `${BASE}${ITEM_URI}`,
+        meta: {
+          operationName: 'read',
+          resource: resources[KEY],
+        },
+      },
+    },
+  }
 
-  const onResponse = (actual) => {
+  const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
@@ -97,7 +117,7 @@ test('createMutator: READ', t => {
       agent,
       resources,
       props: PROPS,
-      onResponse,
+      handleResponse,
     },
     {
       key: KEY,
@@ -110,14 +130,21 @@ test('createMutator: READ', t => {
 
 test('createMutator: REMOVE', t => {
 
-  const expected = RequestFactory({
-    operationName: 'remove',
-    itemUri: ITEM_URI,
-    baseUri: BASE,
-    name: KEY,
-  })
+  let expected = {
+    response: {
+      body: {
+        callback: CALLBACK,
+        method: 'DELETE',
+        uri: `${BASE}${ITEM_URI}`,
+        meta: {
+          operationName: 'remove',
+          resource: resources[KEY],
+        },
+      },
+    },
+  }
 
-  const onResponse = (actual) => {
+  const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
@@ -126,7 +153,7 @@ test('createMutator: REMOVE', t => {
       agent,
       resources,
       props: PROPS,
-      onResponse,
+      handleResponse,
     },
     {
       key: KEY,
@@ -139,13 +166,21 @@ test('createMutator: REMOVE', t => {
 
 test('createMutator: LIST', t => {
 
-  const expected = RequestFactory({
-    operationName: 'list',
-    baseUri: BASE,
-    name: KEY,
-  })
+  let expected = {
+    response: {
+      body: {
+        callback: CALLBACK,
+        method: 'GET',
+        uri: `${BASE}`,
+        meta: {
+          operationName: 'list',
+          resource: resources[KEY],
+        },
+      },
+    },
+  }
 
-  const onResponse = (actual) => {
+  const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
@@ -154,7 +189,7 @@ test('createMutator: LIST', t => {
       agent,
       resources,
       props: PROPS,
-      onResponse,
+      handleResponse,
     },
     {
       key: KEY,
@@ -167,27 +202,35 @@ test('createMutator: LIST', t => {
 
 test('createMutator: SUB CREATE', t => {
 
-  const expected = RequestFactory({
-    operationName: 'create',
-    payload: PAYLOAD,
-    baseUri: `${BASE}${ITEM_URI}${SUB_BASE}`,
-    name: KEY,
-  })
-
-  const onResponse = (actual) => {
-    t.deepEqual(actual, expected)
-  }
-
   const resource = normalizeResource({
     base: BASE,
     item: ITEM_URI,
     subs: {
-      [SUB_KEY]: normalizeResource({
+      [SUB_KEY]: {
         base: SUB_BASE,
         item: SUB_ITEM_URI,
-      }),
+      },
     },
   })
+
+  let expected = {
+    response: {
+      body: {
+        callback: CALLBACK,
+        method: 'POST',
+        payload: PAYLOAD,
+        uri: `${BASE}${ITEM_URI}${SUB_BASE}`,
+        meta: {
+          operationName: 'create',
+          resource: resource.subs[SUB_KEY],
+        },
+      },
+    },
+  }
+
+  const handleResponse = (actual) => {
+    t.deepEqual(actual, expected)
+  }
 
   const mutator = createMutator.call(
     {
@@ -196,7 +239,7 @@ test('createMutator: SUB CREATE', t => {
         [KEY]: resource,
       },
       props: PROPS,
-      onResponse,
+      handleResponse,
     },
     {
       key: KEY,

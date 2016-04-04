@@ -23,6 +23,7 @@ test('normalizeResource: from baseUri string', t => {
 
   delete actual.getUri
   delete actual.getMethod
+  delete actual.getBase
 
   t.deepEqual(actual, expected)
   t.end()

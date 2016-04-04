@@ -1,6 +1,6 @@
 import test from 'blue-tape'
 
-import { getUri } from '../../source/utils'
+import { getUri, getBase } from '../../source/utils'
 
 const BASE = '/api/v1'
 const PARENT_BASE = '/parent_base'
@@ -13,16 +13,18 @@ const ID = 'this_is_the_id'
 test('getUri: no base', t => {
   t.plan(1)
 
-  const actual = getUri.call(
-    {
-      defaultOperation: 'list',
-      list: {uri: '/list/${id}/abc/${props.abc}/xyz/${props.xyz}'},
-    },
-    {
-      id: ID,
-      props: PROPS,
-    }
-  )
+  let container = {
+    getBase,
+    defaultOperation: 'list',
+    list: {uri: '/list/${id}/abc/${props.abc}/xyz/${props.xyz}'},
+  }
+
+  container.getBase = getBase.bind(container)
+
+  const actual = getUri.call(container, {
+    id: ID,
+    props: PROPS,
+  })
 
   const expected = `/list/${ID}/abc/${PROPS.abc}/xyz/${PROPS.xyz}`
 
@@ -34,17 +36,18 @@ test('getUri: no base', t => {
 test('getUri: base', t => {
   t.plan(1)
 
-  const actual = getUri.call(
-    {
-      base: BASE,
-      defaultOperation: 'list',
-      list: {uri: '/list/${id}/abc/${props.abc}/xyz/${props.xyz}'},
-    },
-    {
-      id: ID,
-      props: PROPS,
-    }
-  )
+  let container = {
+    base: BASE,
+    defaultOperation: 'list',
+    list: {uri: '/list/${id}/abc/${props.abc}/xyz/${props.xyz}'},
+  }
+
+  container.getBase = getBase.bind(container)
+
+  const actual = getUri.call(container, {
+    id: ID,
+    props: PROPS,
+  })
 
   const expected = `${BASE}/list/${ID}/abc/${PROPS.abc}/xyz/${PROPS.xyz}`
 
@@ -56,18 +59,20 @@ test('getUri: base', t => {
 test('getUri: parentBase', t => {
   t.plan(1)
 
-  const actual = getUri.call(
-    {
-      base: BASE,
-      parentBase: PARENT_BASE,
-      defaultOperation: 'list',
-      list: {uri: '/list/${id}/abc/${props.abc}/xyz/${props.xyz}'},
-    },
-    {
-      id: ID,
-      props: PROPS,
-    }
-  )
+  let container = {
+    base: BASE,
+    getBase,
+    parentBase: PARENT_BASE,
+    defaultOperation: 'list',
+    list: {uri: '/list/${id}/abc/${props.abc}/xyz/${props.xyz}'},
+  }
+
+  container.getBase = getBase.bind(container)
+
+  const actual = getUri.call(container, {
+    id: ID,
+    props: PROPS,
+  })
 
   const expected = `${PARENT_BASE}${BASE}/list/${ID}/abc/${PROPS.abc}/xyz/${PROPS.xyz}`
 

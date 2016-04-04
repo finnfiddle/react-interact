@@ -4,7 +4,6 @@ import agent from '../mock/agent'
 import { fetch, normalizeResource } from '../../source/utils'
 
 const BASE = '/test'
-const ITEM_URI = '/test_id'
 const KEY = 'testResource'
 
 test('fetch: default', function (t) {

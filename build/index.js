@@ -9922,7 +9922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var match = undefined;
 	  var result = input;
 	
-	  while ((match = RE.exec(input)) !== null) {
+	  while ((match = RE.exec(result)) !== null) {
 	    result = result.replace(match[0], (0, _lodashGet2['default'])(params, match[1]));
 	  }
 	
@@ -9946,10 +9946,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var props = _ref3.props;
 	
 	  var params = { id: id, props: props };
-	  var parentBase = this.parentBase || '';
 	  var uri = this[operationName || this.defaultOperation].uri;
 	
-	  return '' + parentBase + this.getBase({ id: id, props: props }) + matchAndReplace(uri, params);
+	  return '' + this.getBase({ id: id, props: props }) + matchAndReplace(uri, params);
 	};
 	
 	var getMethod = function getMethod(_ref4) {
@@ -9975,6 +9974,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  resource.defaultOperation = data.defaultOperation;
 	  resource.base = data.base;
+	  if (isSet(data.parentBase)) resource.parentBase = data.parentBase;
 	  resource.list = normalizeOperation({
 	    resource: data,
 	    operationName: 'list',
@@ -10003,7 +10003,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  if (isSet(data.subs)) {
-	    resource.subs = data.subs;
+	    resource.subs = {};
+	    for (var subKey in data.subs) {
+	      resource.subs[subKey] = normalizeResource(data.subs[subKey]);
+	    }
 	  }
 	
 	  resource.getBase = getBase.bind(resource);
@@ -10087,6 +10090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  isString: isString,
 	  isFunction: isFunction,
 	  fetch: fetch,
+	  getBase: getBase,
 	  getUri: getUri,
 	  getMethod: getMethod,
 	  normalizeResource: normalizeResource,
@@ -16048,16 +16052,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    if ((0, _utils.isSet)(resource.subs)) {
 	      for (var sk in resource.subs) {
+	        resource.subs[sk].parentBase = resource.getUri({
+	          operationName: 'read',
+	          props: _this.props,
+	          id: id
+	        });
+	
 	        subMutator[sk] = createMutator.call({
 	          props: _this.props,
 	          resources: resource.subs,
 	          agent: _this.agent,
-	          handleResponse: _this.handleResponse.bind(_this),
-	          parentBase: resource.getUri({
-	            operationName: 'read',
-	            props: _this.props,
-	            id: id
-	          })
+	          handleResponse: _this.handleResponse.bind(_this)
 	        }, {
 	          key: sk
 	        });

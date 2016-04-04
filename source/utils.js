@@ -36,7 +36,7 @@ const matchAndReplace = function (input, params) {
   let match
   let result = input
 
-  while ((match = RE.exec(input)) !== null) {
+  while ((match = RE.exec(result)) !== null) {
     result = result.replace(match[0], get(params, match[1]))
   }
 
@@ -53,10 +53,9 @@ const getBase = function ({ id, props }) {
 
 const getUri = function ({ operationName, id, props }) {
   const params = {id, props}
-  const parentBase = this.parentBase || ''
   let uri = this[operationName || this.defaultOperation].uri
 
-  return `${parentBase}${this.getBase({id, props})}${matchAndReplace(uri, params)}`
+  return `${this.getBase({id, props})}${matchAndReplace(uri, params)}`
 }
 
 const getMethod = function ({ operationName }) {
@@ -81,6 +80,7 @@ const normalizeResource = (resourceData) => {
 
   resource.defaultOperation = data.defaultOperation
   resource.base = data.base
+  if (isSet(data.parentBase)) resource.parentBase = data.parentBase
   resource.list = normalizeOperation({
     resource: data,
     operationName: 'list',
@@ -110,7 +110,10 @@ const normalizeResource = (resourceData) => {
   }
 
   if (isSet(data.subs)) {
-    resource.subs = data.subs
+    resource.subs = {}
+    for (let subKey in data.subs) {
+      resource.subs[subKey] = normalizeResource(data.subs[subKey])
+    }
   }
 
   resource.getBase = getBase.bind(resource)
@@ -183,6 +186,7 @@ export default {
   isString,
   isFunction,
   fetch,
+  getBase,
   getUri,
   getMethod,
   normalizeResource,
