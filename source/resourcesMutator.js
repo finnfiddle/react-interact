@@ -18,7 +18,7 @@ export function createMutator({ key }) {
           resource,
         },
       })
-      .then(this.handleResponse),
+      .then(this.handleResponse.bind(this)),
 
       read: (callback) => this.agent.call(this, {
         uri: resource.getUri({operationName: 'read', props: this.props, id}),
@@ -29,7 +29,7 @@ export function createMutator({ key }) {
           resource,
         },
       })
-      .then(this.handleResponse),
+      .then(this.handleResponse.bind(this)),
 
       remove: (callback) => this.agent.call(this, {
         uri: resource.getUri({operationName: 'remove', props: this.props, id}),
@@ -40,7 +40,7 @@ export function createMutator({ key }) {
           resource,
         },
       })
-      .then(this.handleResponse),
+      .then(this.handleResponse.bind(this)),
 
     }
 
@@ -51,7 +51,7 @@ export function createMutator({ key }) {
             props: this.props,
             resources: resource.subs,
             agent: this.agent,
-            handleResponse: this.handleResponse,
+            handleResponse: this.handleResponse.bind(this),
             parentBase: resource.getUri({
               operationName: 'read',
               props: this.props,
@@ -79,7 +79,7 @@ export function createMutator({ key }) {
       resource,
     },
   })
-  .then(this.handleResponse)
+  .then(this.handleResponse.bind(this))
 
   Mutator.list = (callback) => this.agent.call(this, {
     uri: resource.getUri({operationName: 'list', props: this.props}),
@@ -90,7 +90,7 @@ export function createMutator({ key }) {
       resource,
     },
   })
-  .then(this.handleResponse)
+  .then(this.handleResponse.bind(this))
 
   return Mutator
 
@@ -102,7 +102,7 @@ export default function() {
 
   for (let key in this.resources) {
 
-    mutator[key] = createMutator({
+    mutator[key] = createMutator.call(this, {
       key,
     })
 

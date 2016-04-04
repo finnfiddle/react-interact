@@ -7,6 +7,7 @@ import {
   fetch,
   mergeResponse,
   normalizeResource,
+  addNamesToResources,
 } from './utils'
 import DefaultAgent from './defaultAgent'
 import ResourcesMutator from './resourcesMutator'
@@ -20,9 +21,12 @@ export default {
         init() {
           this.WrappedElement = WrappedElement
 
+          this.resources = {}
           for (let key in resources) {
             this.resources[key] = normalizeResource(resources[key])
           }
+
+          addNamesToResources(this.resources)
 
           this.agent = agent || DefaultAgent
         },
@@ -90,9 +94,11 @@ export default {
         },
 
         fetch({ props }) {
-          fetch.call(this, {props}).then(result => {
-            this.setState(Object.assign({}, result, {_hasFetched: true}))
-          })
+          fetch.call(this, {props})
+            .then(result => {
+              this.setState(Object.assign({}, result, {_hasFetched: true}))
+            })
+            .catch(err => console.log(err))
         },
 
       })

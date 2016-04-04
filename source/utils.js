@@ -32,17 +32,31 @@ const normalizeOperation = ({ resource, operationName, defaultMethod }) => {
   return result
 }
 
-const getUri = function ({ operationName, id, props }) {
-  let uri = this[operationName || this.defaultOperation].uri
+const matchAndReplace = function (input, params) {
   let match
-  const params = {id, props}
-  const parentBase = this.parentBase || ''
+  let result = input
 
-  while ((match = RE.exec(uri)) !== null) {
-    uri = uri.replace(match[0], get(params, match[1]))
+  while ((match = RE.exec(input)) !== null) {
+    result = result.replace(match[0], get(params, match[1]))
   }
 
-  return `${parentBase}${this.base || ''}${uri}`
+  return result
+}
+
+const getBase = function ({ id, props }) {
+  const parentBase = this.parentBase || ''
+  const params = {id, props}
+  const base = this.base || ''
+
+  return `${parentBase}${matchAndReplace(base, params)}`
+}
+
+const getUri = function ({ operationName, id, props }) {
+  const params = {id, props}
+  const parentBase = this.parentBase || ''
+  let uri = this[operationName || this.defaultOperation].uri
+
+  return `${parentBase}${this.getBase({id, props})}${matchAndReplace(uri, params)}`
 }
 
 const getMethod = function ({ operationName }) {
@@ -99,6 +113,7 @@ const normalizeResource = (resourceData) => {
     resource.subs = data.subs
   }
 
+  resource.getBase = getBase.bind(resource)
   resource.getUri = getUri.bind(resource)
   resource.getMethod = getMethod.bind(resource)
 
@@ -107,19 +122,6 @@ const normalizeResource = (resourceData) => {
 
 const addNamesToResources = (resources) => {
   for (let name in resources) resources[name].name = name
-}
-
-const getNormalizedResources = (params, accessor) => {
-  let resources = accessor(params)
-  let normalizedResources = {}
-
-  for (let k in resources) {
-    normalizedResources[k] = normalizeResource(resources[k], params)
-  }
-
-  addNamesToResources(normalizedResources)
-
-  return normalizedResources
 }
 
 const mergeResponse = ({ currentData, response, request }) => {
@@ -166,6 +168,7 @@ const fetch = function ({ props }) {
           result[key] = response.body
           next(null)
         })
+        .catch(err => console.log(err))
 
     }, (err) => {
       if (err) reject(err)
@@ -186,5 +189,4 @@ export default {
   normalizeOperation,
   addNamesToResources,
   mergeResponse,
-  getNormalizedResources,
 }
