@@ -1,7 +1,7 @@
 {
   "name": "react-interact",
   "description": "Declarative REST data fetching for React",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "build/index.js",
   "scripts": {
     "init": "rimraf .validate.json && rimraf .jshintrc",
@@ -28,7 +28,9 @@
     "check": "npm run audit && npm run deps && npm outdated --depth 0"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "test",
+    "build"
   ],
   "devDependencies": {
     "babel": "^5.8.21",
