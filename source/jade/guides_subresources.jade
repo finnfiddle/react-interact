@@ -56,18 +56,20 @@ block content
               },
             }
 
-            export default createContainer(TodoList, ({ id }) => ({
+            export default createContainer(TodoList, {
               todos: {
                 base: '/api/v1/todos',
-                item: `/${id}`,
-                subs: ({ id }) => ({
+                item: '/${id}',
+                subs: {
                   subTodos: {
                     base: '/sub_todos',
-                    item: `/${id}`,
+                    item: '/${id}',
                   },
-                }),
+                },
               },
-            }))
+            })
+            
+      p More info coming soon...
       
       //- +space    
 

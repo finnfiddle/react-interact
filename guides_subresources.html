@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <title>Interact</title>
-    <link rel="stylesheet" href="/react-interact//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
-    <link rel="stylesheet" href="/react-interact/css/main.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
@@ -16,7 +16,7 @@
             <li><a href="#containers">Containers</a></li>
             <li><a href="#mutations">Mutations</a></li>
             <li><a href="#subresources">Subresources</a></li>
-            <li><a href="#custom_agents">Custom Agents</a></li>
+            <li><a href="#custom_agents">Custom Agents/Interfaces</a></li>
           </ul>
         </div>
         <div class="col-md-9">
@@ -64,19 +64,20 @@ class TodoList extends Component {
   },
 }
 
-export default createContainer(TodoList, ({ id }) =&gt; ({
+export default createContainer(TodoList, {
   todos: {
     base: '/api/v1/todos',
-    item: `/${id}`,
-    subs: ({ id }) =&gt; ({
+    item: '/${id}',
+    subs: {
       subTodos: {
         base: '/sub_todos',
-        item: `/${id}`,
+        item: '/${id}',
       },
-    }),
+    },
   },
-}))
+})
 </code></pre>
+          <p>More info coming soon...</p>
           <br/><br/><br/><br/><br/><br/>
         </div>
       </div>

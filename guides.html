@@ -2,20 +2,20 @@
 <html lang="en">
   <head>
     <title>Interact</title>
-    <link rel="stylesheet" href="/react-interact//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
-    <link rel="stylesheet" href="/react-interact/css/main.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
   <body>
     <nav class="navbar navbar-default">
       <div class="container-fluid">
-        <div class="navbar-header"><a href="/react-interact/" class="navbar-brand">Interact</a></div>
+        <div class="navbar-header"><a href="/" class="navbar-brand">Interact</a></div>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="/react-interact/">Home</a></li>
-          <li><a href="/react-interact/guides.html">Guides</a></li>
-          <li><a href="/react-interact/docs.html">Docs</a></li>
-          <li><a href="/react-interact">Github</a></li>
+          <li><a href="/">Home</a></li>
+          <li><a href="/guides.html">Guides</a></li>
+          <li><a href="/docs.html">Docs</a></li>
+          <li><a href="">Github</a></li>
         </ul>
       </div>
     </nav>
@@ -27,7 +27,7 @@
             <li><a href="#containers">Containers</a></li>
             <li><a href="#mutations">Mutations</a></li>
             <li><a href="#subresources">Subresources</a></li>
-            <li><a href="#custom_agents">Custom Agents</a></li>
+            <li><a href="#custom_agents">Custom Agents/Interfaces</a></li>
           </ul>
         </div>
         <div class="col-md-9">
@@ -73,7 +73,7 @@ export default createContainer(TodoList, () =&gt; ({
               <h4>Result</h4>
               <p>Laundry, Weights, Stroke the cat,</p>
             </div>
-          </div><br/><br/><a href="/react-interact/guides_containers.html" class="btn btn-md btn-primary">Containers in Depth</a>
+          </div><br/><br/><a href="/guides_containers.html" class="btn btn-md btn-primary">Containers in Depth</a>
           <div id="mutations"><br/><br/>
           </div>
           <h2>Mutations</h2>
@@ -102,7 +102,7 @@ class TodoList extends Component {
 export default createContainer(TodoList, () =&gt; ({
   todos: '/api/v1/todos',
 }))
-</code></pre><br/><br/><a href="/react-interact/guides_mutations.html" class="btn btn-md btn-primary">Mutations in Depth</a>
+</code></pre><br/><br/><a href="/guides_mutations.html" class="btn btn-md btn-primary">Mutations in Depth</a>
           <div id="subresources"><br/><br/>
           </div>
           <h2>Subresources</h2>
@@ -153,11 +153,13 @@ export default createContainer(TodoList, ({ id }) =&gt; ({
   },
 }))
 
-</code></pre><br/><br/><a href="/react-interact/guides_subresources.html" class="btn btn-md btn-primary">Subresources in Depth</a>
-          <div id="custom_interfaces"><br/><br/>
+</code></pre><br/><br/><a href="/guides_subresources.html" class="btn btn-md btn-primary">Subresources in Depth</a>
+          <div id="custom_agents"><br/><br/>
           </div>
-          <h2>Custom Interfaces</h2>
-          <p>More info coming soon...</p><br/><br/><br/><br/><br/><br/>
+          <h2>Custom Agents/Interfaces</h2>
+          <p>By default Interact sends HTTP requests using <a target="_blank" href="https://visionmedia.github.io/superagent/">Superagent</a>&nbsp;under the hood but if for example you wish to provide offline-first functionality for your app or you wish to use a different protocol to HTTP you can pass a custom agent/interface to your container that will be the bridge between the frontend and the backend. </p>
+          <p>This would enable you to use alternatives like PouchDB for example or WebSockets.</p>
+          <p>More info coming soon... See the defaultAgent in the source if you wish to understand better in the meantime.</p><br/><br/><br/><br/><br/><br/>
         </div>
       </div>
     </div>

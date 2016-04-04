@@ -11,33 +11,28 @@ block content
         
       p Containers need to be configured so that they know where and how to send network requests. The second argument to 
         code Interact.createContainer()
-        | &nbsp;is a function that returns an object where each key-value pair corresponds to an API resource.
+        | &nbsp;is an object where each key-value pair corresponds to an API resource.
       p Example:
         
       pre
         code.javascript.
-          Interact.createContainer(WrappedComponent, () => ({
+          Interact.createContainer(WrappedComponent, {
             resourceName: {
-              base: '/api/v1/resourceName', // base uri for resource that gets 
-                                            // prepended to all operation uris
-              list: {method: 'GET', uri: '...'}, // method and uri for listing items
-              
-              read: {method: 'GET', uri: '...'}, // method and uri for reading an item
-              
-              create: {method: 'POST', uri: '...'}, // method and uri for creating an item
-              
-              update: {method: 'PUT', uri: '...'}, // method and uri for updating an item
-              
-              patch: {method: 'PATCH', uri: '...'}, // method and uri for patching an item
-              
-              remove: {method: 'DELETE', uri: '...'}, // method and uri for removing an item
-              
+              base: '/api/v1/resourceName', // base uri prepended to all operation uris
+              list: {method: 'GET', uri: ''}, // method and uri for listing items
+              create: {method: 'POST', uri: ''}, // method and uri for creating an item
+              read: {method: 'GET', uri: '/1'}, // method and uri for reading an item
+              update: {method: 'PUT', uri: '/1'}, // method and uri for updating an item
+              patch: {method: 'PATCH', uri: '/1'}, // method and uri for patching an item
+              remove: {method: 'DELETE', uri: '/1'}, // method and uri for removing an item
               defaultOperation: 'list', // operation that is executed when component mounts
-              
               uid: 'id', // unique identifier key for each item
             },
             ...
-          }))
+          })
+          
+      .callout.callout-warning 
+        h4 Notice that the uri template strings for each operation do not use back-ticks like ES6 template strings, but instead use ordinary single or double quotation marks.
         
       +space
       h4 Defaults / URI shorthand
@@ -45,35 +40,41 @@ block content
         
       pre
         code.javascript.
-          Interact.createContainer(WrappedComponent, () => ({
+          Interact.createContainer(WrappedComponent, {
             resourceName: {
               base: '/api/v1/resourceName',
-              list: '...',
-              read: '...',
-              create: '...',
-              update: '...',
-              patch: '...',
-              remove: '...',
+              list: '',
+              create: '',
+              read: '/1',
+              update: '/1',
+              patch: '/1',
+              remove: '/1',
             },
             ...
-          }))
+          })
 
       +space    
       h4 Dynamic URIs
-      p The function that returns the resources config object gets passed an object containing the props and other parameters for the request. Operation URIs can be made dynamic by using this passed-in data. 
+      p Each operation URI on a resource gets evaluated as a template string. The template string gets passed the 
+        code props
+        | &nbsp;of the container and the 
+        code id
+        | &nbsp;for the item when performing a mutation (see the 
+        a(href="/guides_mutations.html") Mutations Guide
+        | &nbsp; for more info).
       p For example:
 
       pre
         code.javascript.
-          Interact.createContainer(WrappedComponent, ({props, id, payload}) => ({
+          Interact.createContainer(WrappedComponent, {
             resourceName: {
-              base: '/api/v1/resourceName',
+              base: '/api/v1/${props.resourceName}',
               list: '',
-              read: `/${id}`,
               create: '',
-              update: `/${id}`,
-              patch: `/${id}`,
-              remove: `/${id}`,
+              read: '/${id}',
+              update: '/${id}',
+              patch: '/${id}',
+              remove: '/${id}',
             },
             ...
           }))
@@ -87,20 +88,21 @@ block content
 
       pre
         code.javascript.
-          Interact.createContainer(WrappedComponent, ({props, id, payload}) => ({
+          Interact.createContainer(WrappedComponent, {
             resourceName: {
-              base: '/api/v1/resourceName',
-              list: '',
-              item: `/${id}`,
+              base: '/api/v1/${props.resourceName}',
+              item: '/${id}',
             },
             ...
-          }))
+          })
           
           
       .callout.callout-info 
         h4 The 
           code create
-          | &nbsp;operation uses the base URI by default and can be omitted.
+          | &nbsp;and 
+          code list
+          | &nbsp;operations use the base URI by default and can be omitted.
         
       .callout.callout-warning 
         h4 Only use the
@@ -113,30 +115,30 @@ block content
        
       pre
         code.javascript.
-          Interact.createContainer(WrappedComponent, ({props, id, payload}) => ({
-            resourceName: '/api/v1/resourceName',
+          Interact.createContainer(WrappedComponent, {
+            resourceName: '/api/v1/${props.resourceName}',
             ...
-          }))
+          })
           
 
       p It would be equivalent to writing the following:
 
       pre
         code.javascript.
-          Interact.createContainer(WrappedComponent, ({props, id, payload}) => ({
+          Interact.createContainer(WrappedComponent, {
             resourceName: {
-              base: '/api/v1/resourceName',
+              base: '/api/v1/${props.resourceName}',
               list: {method: 'GET', uri: ''},
-              read: {method: 'GET', uri: `/${id}`},
+              read: {method: 'GET', uri: '/${id}'},
               create: {method: 'POST', uri: ''},
-              update: {method: 'PUT', uri: `/${id}`},
-              patch: {method: 'PATCH', uri: `/${id}`},
-              remove: {method: 'DELETE', uri: `/${id}`},
+              update: {method: 'PUT', uri: '/${id}'},
+              patch: {method: 'PATCH', uri: '/${id}'},
+              remove: {method: 'DELETE', uri: '/${id}'},
               defaultOperation: 'list',
               uid: 'id',
             },
             ...
-          }))
+          })
           
       +space    
       

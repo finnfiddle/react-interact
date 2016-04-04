@@ -166,14 +166,20 @@ block content
       +space
       a.btn.btn-md.btn-primary(href=uri_prefix+"/guides_subresources.html") Subresources in Depth
       
-      #custom_interfaces
+      #custom_agents
         +space
-      h2 Custom Interfaces
-      p More info coming soon...
+      h2 Custom Agents/Interfaces
+      p By default Interact sends HTTP requests using 
+        a(target="_blank" href="https://visionmedia.github.io/superagent/") Superagent
+        | &nbsp;under the hood but if for example you wish to provide offline-first functionality for your app or you wish to use a different protocol to HTTP you can pass a custom agent/interface to your container that will be the bridge between the frontend and the backend. 
+      
+      p This would enable you to use alternatives like PouchDB for example or WebSockets.
+      
+      p More info coming soon... See the defaultAgent in the source if you wish to understand better in the meantime.
       //- h3 Example
       
       //- +space
-      //- a.btn.btn-md.btn-primary(href=uri_prefix+"/.html") Custom Interfaces in Depth
+      //- a.btn.btn-md.btn-primary(href=uri_prefix+"/.html") Custom Agents in Depth
       
       +space
       +space
