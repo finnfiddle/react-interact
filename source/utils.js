@@ -1,4 +1,5 @@
 import { Promise } from 'es6-promise'
+import qs from 'qs'
 import cloneDeep from 'lodash.clonedeep'
 import findIndex from 'lodash.findindex'
 import get from 'lodash.get'
@@ -51,11 +52,25 @@ const getBase = function ({ id, props }) {
   return `${parentBase}${matchAndReplace(base, params)}`
 }
 
-const getUri = function ({ operationName, id, props }) {
+const addQuery = function (query, uri) {
+  if (!isSet(query)) return uri
+  if (uri.indexOf('?') > -1) {
+    const parts = qs.parse(uri.split('?'))
+    const existingQuery = parts[1]
+    return `${parts[0]}?${qs.stringify(
+      Object.assign({}, existingQuery, query)
+    )}`
+  }
+  else {
+    return `${uri}?${qs.stringify(query)}`
+  }
+}
+
+const getUri = function ({ operationName, id, props, query }) {
   const params = {id, props}
   let uri = this[operationName || this.defaultOperation].uri
-
-  return `${this.getBase({id, props})}${matchAndReplace(uri, params)}`
+  let result = `${this.getBase(params)}${matchAndReplace(uri, params)}`
+  return addQuery(query, result)
 }
 
 const getMethod = function ({ operationName }) {
@@ -80,6 +95,7 @@ const normalizeResource = (resourceData) => {
 
   resource.defaultOperation = data.defaultOperation
   resource.base = data.base
+  resource.uid = data.uid
   if (isSet(data.parentBase)) resource.parentBase = data.parentBase
   resource.list = normalizeOperation({
     resource: data,
@@ -143,6 +159,7 @@ const mergeResponse = ({ currentData, response, request }) => {
       case 'update':
         let updatee = data.filter(d => d[uid] === body[uid])[0]
         if (isSet(updatee)) Object.assign(updatee, body)
+        console.log({updatee, body, uid})
         break
       case 'remove':
         const index = findIndex(data, {[uid]: body[uid]})
@@ -162,16 +179,21 @@ const fetch = function ({ props }) {
 
   return new Promise((resolve, reject) => {
     asyncMap(this.resources, (resource, key, next) => {
-      this
-        .agent.call(this, {
-          uri: resource.getUri({props}),
-          method: resource.getMethod({}),
-        })
-        .then(({ response }) => {
-          result[key] = response.body
-          next(null)
-        })
-        .catch(err => console.log(err))
+      if (!isSet(resource.defaultOperation)) {
+        next()
+      }
+      else {
+        this
+          .agent.call(this, {
+            uri: resource.getUri({props}),
+            method: resource.getMethod({}),
+          })
+          .then(({ response }) => {
+            result[key] = response.body
+            next(null)
+          })
+          .catch(err => console.log(err))
+      }
 
     }, (err) => {
       if (err) reject(err)
@@ -193,4 +215,5 @@ export default {
   normalizeOperation,
   addNamesToResources,
   mergeResponse,
+  addQuery,
 }

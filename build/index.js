@@ -80,11 +80,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(216);
 	
-	var _defaultAgent = __webpack_require__(228);
+	var _defaultAgent = __webpack_require__(232);
 	
 	var _defaultAgent2 = _interopRequireDefault(_defaultAgent);
 	
-	var _resourcesMutator = __webpack_require__(235);
+	var _resourcesMutator = __webpack_require__(239);
 	
 	var _resourcesMutator2 = _interopRequireDefault(_resourcesMutator);
 	
@@ -147,12 +147,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var resource = request.meta.resource;
 	
 	        if ((0, _utils.isFunction)(request.callback)) {
-	          (function () {
-	            var clonedResource = (0, _lodashClonedeep2['default'])(_this.state[resource.name]);
-	            request.callback(response, clonedResource, function () {
-	              _this.setState(_defineProperty({}, resource.name, clonedResource));
-	            });
-	          })();
+	          var clonedResource = (0, _lodashClonedeep2['default'])(this.state[resource.name]);
+	          request.callback(response, clonedResource, function (updatedResource) {
+	            console.log(_defineProperty({}, resource.name, updatedResource));
+	            if ((0, _utils.isSet)(updatedResource)) {
+	              _this.setState(_defineProperty({}, resource.name, updatedResource));
+	            }
+	          });
 	        } else {
 	          (0, _utils.mergeResponse)({
 	            currentData: this.state[resource.name],
@@ -9870,21 +9871,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _es6Promise = __webpack_require__(217);
 	
+	var _qs = __webpack_require__(221);
+	
+	var _qs2 = _interopRequireDefault(_qs);
+	
 	var _lodashClonedeep = __webpack_require__(214);
 	
 	var _lodashClonedeep2 = _interopRequireDefault(_lodashClonedeep);
 	
-	var _lodashFindindex = __webpack_require__(221);
+	var _lodashFindindex = __webpack_require__(225);
 	
 	var _lodashFindindex2 = _interopRequireDefault(_lodashFindindex);
 	
-	var _lodashGet = __webpack_require__(224);
+	var _lodashGet = __webpack_require__(228);
 	
 	var _lodashGet2 = _interopRequireDefault(_lodashGet);
 	
-	var _nimble = __webpack_require__(226);
+	var _nimble = __webpack_require__(230);
 	
-	var _constants = __webpack_require__(227);
+	var _constants = __webpack_require__(231);
 	
 	var RE = /\$\{(.[^}]*)\}/;
 	
@@ -9940,15 +9945,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return '' + parentBase + matchAndReplace(base, params);
 	};
 	
+	var addQuery = function addQuery(query, uri) {
+	  if (!isSet(query)) return uri;
+	  if (uri.indexOf('?') > -1) {
+	    var parts = _qs2['default'].parse(uri.split('?'));
+	    var existingQuery = parts[1];
+	    return parts[0] + '?' + _qs2['default'].stringify(_extends({}, existingQuery, query));
+	  } else {
+	    return uri + '?' + _qs2['default'].stringify(query);
+	  }
+	};
+	
 	var getUri = function getUri(_ref3) {
 	  var operationName = _ref3.operationName;
 	  var id = _ref3.id;
 	  var props = _ref3.props;
+	  var query = _ref3.query;
 	
 	  var params = { id: id, props: props };
 	  var uri = this[operationName || this.defaultOperation].uri;
-	
-	  return '' + this.getBase({ id: id, props: props }) + matchAndReplace(uri, params);
+	  var result = '' + this.getBase(params) + matchAndReplace(uri, params);
+	  return addQuery(query, result);
 	};
 	
 	var getMethod = function getMethod(_ref4) {
@@ -9974,6 +9991,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  resource.defaultOperation = data.defaultOperation;
 	  resource.base = data.base;
+	  resource.uid = data.uid;
 	  if (isSet(data.parentBase)) resource.parentBase = data.parentBase;
 	  resource.list = normalizeOperation({
 	    resource: data,
@@ -10046,6 +10064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return d[uid] === body[uid];
 	        })[0];
 	        if (isSet(updatee)) _extends(updatee, body);
+	        console.log({ updatee: updatee, body: body, uid: uid });
 	        break;
 	      case 'remove':
 	        var index = (0, _lodashFindindex2['default'])(data, _defineProperty({}, uid, body[uid]));
@@ -10068,17 +10087,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  return new _es6Promise.Promise(function (resolve, reject) {
 	    (0, _nimble.map)(_this.resources, function (resource, key, next) {
-	      _this.agent.call(_this, {
-	        uri: resource.getUri({ props: props }),
-	        method: resource.getMethod({})
-	      }).then(function (_ref7) {
-	        var response = _ref7.response;
+	      if (!isSet(resource.defaultOperation)) {
+	        next();
+	      } else {
+	        _this.agent.call(_this, {
+	          uri: resource.getUri({ props: props }),
+	          method: resource.getMethod({})
+	        }).then(function (_ref7) {
+	          var response = _ref7.response;
 	
-	        result[key] = response.body;
-	        next(null);
-	      })['catch'](function (err) {
-	        return console.log(err);
-	      });
+	          result[key] = response.body;
+	          next(null);
+	        })['catch'](function (err) {
+	          return console.log(err);
+	        });
+	      }
 	    }, function (err) {
 	      if (err) reject(err);else resolve(result);
 	    });
@@ -10096,7 +10119,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  normalizeResource: normalizeResource,
 	  normalizeOperation: normalizeOperation,
 	  addNamesToResources: addNamesToResources,
-	  mergeResponse: mergeResponse
+	  mergeResponse: mergeResponse,
+	  addQuery: addQuery
 	};
 	module.exports = exports['default'];
 
@@ -11175,6 +11199,495 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+	
+	var Stringify = __webpack_require__(222);
+	var Parse = __webpack_require__(224);
+	
+	module.exports = {
+	    stringify: Stringify,
+	    parse: Parse
+	};
+
+
+/***/ },
+/* 222 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var Utils = __webpack_require__(223);
+	
+	var internals = {
+	    delimiter: '&',
+	    arrayPrefixGenerators: {
+	        brackets: function (prefix) {
+	            return prefix + '[]';
+	        },
+	        indices: function (prefix, key) {
+	            return prefix + '[' + key + ']';
+	        },
+	        repeat: function (prefix) {
+	            return prefix;
+	        }
+	    },
+	    strictNullHandling: false,
+	    skipNulls: false,
+	    encode: true
+	};
+	
+	internals.stringify = function (object, prefix, generateArrayPrefix, strictNullHandling, skipNulls, encode, filter, sort) {
+	    var obj = object;
+	    if (typeof filter === 'function') {
+	        obj = filter(prefix, obj);
+	    } else if (Utils.isBuffer(obj)) {
+	        obj = String(obj);
+	    } else if (obj instanceof Date) {
+	        obj = obj.toISOString();
+	    } else if (obj === null) {
+	        if (strictNullHandling) {
+	            return encode ? Utils.encode(prefix) : prefix;
+	        }
+	
+	        obj = '';
+	    }
+	
+	    if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
+	        if (encode) {
+	            return [Utils.encode(prefix) + '=' + Utils.encode(obj)];
+	        }
+	        return [prefix + '=' + obj];
+	    }
+	
+	    var values = [];
+	
+	    if (typeof obj === 'undefined') {
+	        return values;
+	    }
+	
+	    var objKeys;
+	    if (Array.isArray(filter)) {
+	        objKeys = filter;
+	    } else {
+	        var keys = Object.keys(obj);
+	        objKeys = sort ? keys.sort(sort) : keys;
+	    }
+	
+	    for (var i = 0; i < objKeys.length; ++i) {
+	        var key = objKeys[i];
+	
+	        if (skipNulls && obj[key] === null) {
+	            continue;
+	        }
+	
+	        if (Array.isArray(obj)) {
+	            values = values.concat(internals.stringify(obj[key], generateArrayPrefix(prefix, key), generateArrayPrefix, strictNullHandling, skipNulls, encode, filter));
+	        } else {
+	            values = values.concat(internals.stringify(obj[key], prefix + '[' + key + ']', generateArrayPrefix, strictNullHandling, skipNulls, encode, filter));
+	        }
+	    }
+	
+	    return values;
+	};
+	
+	module.exports = function (object, opts) {
+	    var obj = object;
+	    var options = opts || {};
+	    var delimiter = typeof options.delimiter === 'undefined' ? internals.delimiter : options.delimiter;
+	    var strictNullHandling = typeof options.strictNullHandling === 'boolean' ? options.strictNullHandling : internals.strictNullHandling;
+	    var skipNulls = typeof options.skipNulls === 'boolean' ? options.skipNulls : internals.skipNulls;
+	    var encode = typeof options.encode === 'boolean' ? options.encode : internals.encode;
+	    var sort = typeof options.sort === 'function' ? options.sort : null;
+	    var objKeys;
+	    var filter;
+	    if (typeof options.filter === 'function') {
+	        filter = options.filter;
+	        obj = filter('', obj);
+	    } else if (Array.isArray(options.filter)) {
+	        objKeys = filter = options.filter;
+	    }
+	
+	    var keys = [];
+	
+	    if (typeof obj !== 'object' || obj === null) {
+	        return '';
+	    }
+	
+	    var arrayFormat;
+	    if (options.arrayFormat in internals.arrayPrefixGenerators) {
+	        arrayFormat = options.arrayFormat;
+	    } else if ('indices' in options) {
+	        arrayFormat = options.indices ? 'indices' : 'repeat';
+	    } else {
+	        arrayFormat = 'indices';
+	    }
+	
+	    var generateArrayPrefix = internals.arrayPrefixGenerators[arrayFormat];
+	
+	    if (!objKeys) {
+	        objKeys = Object.keys(obj);
+	    }
+	
+	    if (sort) {
+	        objKeys.sort(sort);
+	    }
+	
+	    for (var i = 0; i < objKeys.length; ++i) {
+	        var key = objKeys[i];
+	
+	        if (skipNulls && obj[key] === null) {
+	            continue;
+	        }
+	
+	        keys = keys.concat(internals.stringify(obj[key], key, generateArrayPrefix, strictNullHandling, skipNulls, encode, filter, sort));
+	    }
+	
+	    return keys.join(delimiter);
+	};
+
+
+/***/ },
+/* 223 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	var hexTable = (function () {
+	    var array = new Array(256);
+	    for (var i = 0; i < 256; ++i) {
+	        array[i] = '%' + ((i < 16 ? '0' : '') + i.toString(16)).toUpperCase();
+	    }
+	
+	    return array;
+	}());
+	
+	exports.arrayToObject = function (source, options) {
+	    var obj = options.plainObjects ? Object.create(null) : {};
+	    for (var i = 0; i < source.length; ++i) {
+	        if (typeof source[i] !== 'undefined') {
+	            obj[i] = source[i];
+	        }
+	    }
+	
+	    return obj;
+	};
+	
+	exports.merge = function (target, source, options) {
+	    if (!source) {
+	        return target;
+	    }
+	
+	    if (typeof source !== 'object') {
+	        if (Array.isArray(target)) {
+	            target.push(source);
+	        } else if (typeof target === 'object') {
+	            target[source] = true;
+	        } else {
+	            return [target, source];
+	        }
+	
+	        return target;
+	    }
+	
+	    if (typeof target !== 'object') {
+	        return [target].concat(source);
+	    }
+	
+	    var mergeTarget = target;
+	    if (Array.isArray(target) && !Array.isArray(source)) {
+	        mergeTarget = exports.arrayToObject(target, options);
+	    }
+	
+		return Object.keys(source).reduce(function (acc, key) {
+	        var value = source[key];
+	
+	        if (Object.prototype.hasOwnProperty.call(acc, key)) {
+	            acc[key] = exports.merge(acc[key], value, options);
+	        } else {
+	            acc[key] = value;
+	        }
+			return acc;
+	    }, mergeTarget);
+	};
+	
+	exports.decode = function (str) {
+	    try {
+	        return decodeURIComponent(str.replace(/\+/g, ' '));
+	    } catch (e) {
+	        return str;
+	    }
+	};
+	
+	exports.encode = function (str) {
+	    // This code was originally written by Brian White (mscdex) for the io.js core querystring library.
+	    // It has been adapted here for stricter adherence to RFC 3986
+	    if (str.length === 0) {
+	        return str;
+	    }
+	
+	    var string = typeof str === 'string' ? str : String(str);
+	
+	    var out = '';
+	    for (var i = 0; i < string.length; ++i) {
+	        var c = string.charCodeAt(i);
+	
+	        if (
+	            c === 0x2D || // -
+	            c === 0x2E || // .
+	            c === 0x5F || // _
+	            c === 0x7E || // ~
+	            (c >= 0x30 && c <= 0x39) || // 0-9
+	            (c >= 0x41 && c <= 0x5A) || // a-z
+	            (c >= 0x61 && c <= 0x7A) // A-Z
+	        ) {
+	            out += string.charAt(i);
+	            continue;
+	        }
+	
+	        if (c < 0x80) {
+	            out = out + hexTable[c];
+	            continue;
+	        }
+	
+	        if (c < 0x800) {
+	            out = out + (hexTable[0xC0 | (c >> 6)] + hexTable[0x80 | (c & 0x3F)]);
+	            continue;
+	        }
+	
+	        if (c < 0xD800 || c >= 0xE000) {
+	            out = out + (hexTable[0xE0 | (c >> 12)] + hexTable[0x80 | ((c >> 6) & 0x3F)] + hexTable[0x80 | (c & 0x3F)]);
+	            continue;
+	        }
+	
+	        i += 1;
+	        c = 0x10000 + (((c & 0x3FF) << 10) | (string.charCodeAt(i) & 0x3FF));
+	        out += (hexTable[0xF0 | (c >> 18)] + hexTable[0x80 | ((c >> 12) & 0x3F)] + hexTable[0x80 | ((c >> 6) & 0x3F)] + hexTable[0x80 | (c & 0x3F)]);
+	    }
+	
+	    return out;
+	};
+	
+	exports.compact = function (obj, references) {
+	    if (typeof obj !== 'object' || obj === null) {
+	        return obj;
+	    }
+	
+	    var refs = references || [];
+	    var lookup = refs.indexOf(obj);
+	    if (lookup !== -1) {
+	        return refs[lookup];
+	    }
+	
+	    refs.push(obj);
+	
+	    if (Array.isArray(obj)) {
+	        var compacted = [];
+	
+	        for (var i = 0; i < obj.length; ++i) {
+	            if (typeof obj[i] !== 'undefined') {
+	                compacted.push(obj[i]);
+	            }
+	        }
+	
+	        return compacted;
+	    }
+	
+	    var keys = Object.keys(obj);
+	    for (var j = 0; j < keys.length; ++j) {
+	        var key = keys[j];
+	        obj[key] = exports.compact(obj[key], refs);
+	    }
+	
+	    return obj;
+	};
+	
+	exports.isRegExp = function (obj) {
+	    return Object.prototype.toString.call(obj) === '[object RegExp]';
+	};
+	
+	exports.isBuffer = function (obj) {
+	    if (obj === null || typeof obj === 'undefined') {
+	        return false;
+	    }
+	
+	    return !!(obj.constructor && obj.constructor.isBuffer && obj.constructor.isBuffer(obj));
+	};
+
+
+/***/ },
+/* 224 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var Utils = __webpack_require__(223);
+	
+	var internals = {
+	    delimiter: '&',
+	    depth: 5,
+	    arrayLimit: 20,
+	    parameterLimit: 1000,
+	    strictNullHandling: false,
+	    plainObjects: false,
+	    allowPrototypes: false,
+	    allowDots: false
+	};
+	
+	internals.parseValues = function (str, options) {
+	    var obj = {};
+	    var parts = str.split(options.delimiter, options.parameterLimit === Infinity ? undefined : options.parameterLimit);
+	
+	    for (var i = 0; i < parts.length; ++i) {
+	        var part = parts[i];
+	        var pos = part.indexOf(']=') === -1 ? part.indexOf('=') : part.indexOf(']=') + 1;
+	
+	        if (pos === -1) {
+	            obj[Utils.decode(part)] = '';
+	
+	            if (options.strictNullHandling) {
+	                obj[Utils.decode(part)] = null;
+	            }
+	        } else {
+	            var key = Utils.decode(part.slice(0, pos));
+	            var val = Utils.decode(part.slice(pos + 1));
+	
+	            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+	                obj[key] = [].concat(obj[key]).concat(val);
+	            } else {
+	                obj[key] = val;
+	            }
+	        }
+	    }
+	
+	    return obj;
+	};
+	
+	internals.parseObject = function (chain, val, options) {
+	    if (!chain.length) {
+	        return val;
+	    }
+	
+	    var root = chain.shift();
+	
+	    var obj;
+	    if (root === '[]') {
+	        obj = [];
+	        obj = obj.concat(internals.parseObject(chain, val, options));
+	    } else {
+	        obj = options.plainObjects ? Object.create(null) : {};
+	        var cleanRoot = root[0] === '[' && root[root.length - 1] === ']' ? root.slice(1, root.length - 1) : root;
+	        var index = parseInt(cleanRoot, 10);
+	        if (
+	            !isNaN(index) &&
+	            root !== cleanRoot &&
+	            String(index) === cleanRoot &&
+	            index >= 0 &&
+	            (options.parseArrays && index <= options.arrayLimit)
+	        ) {
+	            obj = [];
+	            obj[index] = internals.parseObject(chain, val, options);
+	        } else {
+	            obj[cleanRoot] = internals.parseObject(chain, val, options);
+	        }
+	    }
+	
+	    return obj;
+	};
+	
+	internals.parseKeys = function (givenKey, val, options) {
+	    if (!givenKey) {
+	        return;
+	    }
+	
+	    // Transform dot notation to bracket notation
+	    var key = options.allowDots ? givenKey.replace(/\.([^\.\[]+)/g, '[$1]') : givenKey;
+	
+	    // The regex chunks
+	
+	    var parent = /^([^\[\]]*)/;
+	    var child = /(\[[^\[\]]*\])/g;
+	
+	    // Get the parent
+	
+	    var segment = parent.exec(key);
+	
+	    // Stash the parent if it exists
+	
+	    var keys = [];
+	    if (segment[1]) {
+	        // If we aren't using plain objects, optionally prefix keys
+	        // that would overwrite object prototype properties
+	        if (!options.plainObjects && Object.prototype.hasOwnProperty(segment[1])) {
+	            if (!options.allowPrototypes) {
+	                return;
+	            }
+	        }
+	
+	        keys.push(segment[1]);
+	    }
+	
+	    // Loop through children appending to the array until we hit depth
+	
+	    var i = 0;
+	    while ((segment = child.exec(key)) !== null && i < options.depth) {
+	        i += 1;
+	        if (!options.plainObjects && Object.prototype.hasOwnProperty(segment[1].replace(/\[|\]/g, ''))) {
+	            if (!options.allowPrototypes) {
+	                continue;
+	            }
+	        }
+	        keys.push(segment[1]);
+	    }
+	
+	    // If there's a remainder, just add whatever is left
+	
+	    if (segment) {
+	        keys.push('[' + key.slice(segment.index) + ']');
+	    }
+	
+	    return internals.parseObject(keys, val, options);
+	};
+	
+	module.exports = function (str, opts) {
+	    var options = opts || {};
+	    options.delimiter = typeof options.delimiter === 'string' || Utils.isRegExp(options.delimiter) ? options.delimiter : internals.delimiter;
+	    options.depth = typeof options.depth === 'number' ? options.depth : internals.depth;
+	    options.arrayLimit = typeof options.arrayLimit === 'number' ? options.arrayLimit : internals.arrayLimit;
+	    options.parseArrays = options.parseArrays !== false;
+	    options.allowDots = typeof options.allowDots === 'boolean' ? options.allowDots : internals.allowDots;
+	    options.plainObjects = typeof options.plainObjects === 'boolean' ? options.plainObjects : internals.plainObjects;
+	    options.allowPrototypes = typeof options.allowPrototypes === 'boolean' ? options.allowPrototypes : internals.allowPrototypes;
+	    options.parameterLimit = typeof options.parameterLimit === 'number' ? options.parameterLimit : internals.parameterLimit;
+	    options.strictNullHandling = typeof options.strictNullHandling === 'boolean' ? options.strictNullHandling : internals.strictNullHandling;
+	
+	    if (
+	        str === '' ||
+	        str === null ||
+	        typeof str === 'undefined'
+	    ) {
+	        return options.plainObjects ? Object.create(null) : {};
+	    }
+	
+	    var tempObj = typeof str === 'string' ? internals.parseValues(str, options) : str;
+	    var obj = options.plainObjects ? Object.create(null) : {};
+	
+	    // Iterate over the keys and setup the new object
+	
+	    var keys = Object.keys(tempObj);
+	    for (var i = 0; i < keys.length; ++i) {
+	        var key = keys[i];
+	        var newObj = internals.parseKeys(key, tempObj[key], options);
+	        obj = Utils.merge(obj, newObj, options);
+	    }
+	
+	    return Utils.compact(obj);
+	};
+
+
+/***/ },
+/* 225 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/**
 	 * lodash 4.2.1 (Custom Build) <https://lodash.com/>
 	 * Build: `lodash modularize exports="npm" -o ./`
@@ -11183,8 +11696,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 * Available under MIT license <https://lodash.com/license>
 	 */
-	var baseFindIndex = __webpack_require__(222),
-	    baseIteratee = __webpack_require__(223);
+	var baseFindIndex = __webpack_require__(226),
+	    baseIteratee = __webpack_require__(227);
 	
 	/**
 	 * This method is like `_.find` except that it returns the index of the first
@@ -11229,7 +11742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 222 */
+/* 226 */
 /***/ function(module, exports) {
 
 	/**
@@ -11267,7 +11780,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 223 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -13269,7 +13782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(64)(module), (function() { return this; }())))
 
 /***/ },
-/* 224 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -13280,7 +13793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
 	 * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	 */
-	var stringToPath = __webpack_require__(225);
+	var stringToPath = __webpack_require__(229);
 	
 	/** `Object#toString` result references. */
 	var symbolTag = '[object Symbol]';
@@ -13459,7 +13972,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 225 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -14178,7 +14691,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(64)(module), (function() { return this; }())))
 
 /***/ },
-/* 226 */
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -14414,7 +14927,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 227 */
+/* 231 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -14435,7 +14948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.RESOURCE_DEFAULTS = RESOURCE_DEFAULTS;
 
 /***/ },
-/* 228 */
+/* 232 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14446,7 +14959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _superagent = __webpack_require__(229);
+	var _superagent = __webpack_require__(233);
 	
 	var _superagent2 = _interopRequireDefault(_superagent);
 	
@@ -14480,17 +14993,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 229 */
+/* 233 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module dependencies.
 	 */
 	
-	var Emitter = __webpack_require__(230);
-	var reduce = __webpack_require__(231);
-	var requestBase = __webpack_require__(232);
-	var isObject = __webpack_require__(233);
+	var Emitter = __webpack_require__(234);
+	var reduce = __webpack_require__(235);
+	var requestBase = __webpack_require__(236);
+	var isObject = __webpack_require__(237);
 	
 	/**
 	 * Root reference for iframes.
@@ -14539,7 +15052,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Expose `request`.
 	 */
 	
-	var request = module.exports = __webpack_require__(234).bind(null, Request);
+	var request = module.exports = __webpack_require__(238).bind(null, Request);
 	
 	/**
 	 * Determine XHR.
@@ -15563,7 +16076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 230 */
+/* 234 */
 /***/ function(module, exports) {
 
 	
@@ -15730,7 +16243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 231 */
+/* 235 */
 /***/ function(module, exports) {
 
 	
@@ -15759,13 +16272,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 232 */
+/* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Module of mixed-in functions shared between node and client code
 	 */
-	var isObject = __webpack_require__(233);
+	var isObject = __webpack_require__(237);
 	
 	/**
 	 * Clear previous timeout.
@@ -15931,7 +16444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 233 */
+/* 237 */
 /***/ function(module, exports) {
 
 	/**
@@ -15950,7 +16463,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 234 */
+/* 238 */
 /***/ function(module, exports) {
 
 	// The node and browser modules expose versions of this with the
@@ -15988,7 +16501,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 235 */
+/* 239 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16007,13 +16520,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var resource = this.resources[key];
 	
-	  var Mutator = function Mutator(id) {
+	  var Mutator = function Mutator(id, query) {
 	
 	    var subMutator = {
 	
 	      update: function update(payload, callback) {
 	        return _this.agent.call(_this, {
-	          uri: resource.getUri({ operationName: 'update', props: _this.props, id: id }),
+	          uri: resource.getUri({
+	            operationName: 'update',
+	            props: _this.props,
+	            id: id,
+	            query: query
+	          }),
 	          method: resource.getMethod({ operationName: 'update' }),
 	          payload: payload,
 	          callback: callback,
@@ -16021,33 +16539,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	            operationName: 'update',
 	            resource: resource
 	          }
-	        }).then(_this.handleResponse.bind(_this));
+	        }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
+	          return console.log(err);
+	        });
 	      },
 	
 	      read: function read(callback) {
 	        return _this.agent.call(_this, {
-	          uri: resource.getUri({ operationName: 'read', props: _this.props, id: id }),
+	          uri: resource.getUri({
+	            operationName: 'read',
+	            props: _this.props,
+	            id: id,
+	            query: query
+	          }),
 	          method: resource.getMethod({ operationName: 'read' }),
 	          callback: callback,
 	          meta: {
 	            operationName: 'read',
 	            resource: resource
 	          }
-	        }).then(_this.handleResponse.bind(_this));
+	        }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
+	          return console.log(err);
+	        });
 	      },
 	
 	      remove: function remove(callback) {
 	        return _this.agent.call(_this, {
-	          uri: resource.getUri({ operationName: 'remove', props: _this.props, id: id }),
+	          uri: resource.getUri({
+	            operationName: 'remove',
+	            props: _this.props,
+	            id: id,
+	            query: query
+	          }),
 	          method: resource.getMethod({ operationName: 'remove' }),
 	          callback: callback,
 	          meta: {
 	            operationName: 'remove',
 	            resource: resource
 	          }
-	        }).then(_this.handleResponse.bind(_this));
+	        }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
+	          return console.log(err);
+	        });
 	      }
-	
 	    };
 	
 	    if ((0, _utils.isSet)(resource.subs)) {
@@ -16082,7 +16615,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        operationName: 'create',
 	        resource: resource
 	      }
-	    }).then(_this.handleResponse.bind(_this));
+	    }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
+	      return console.log(err);
+	    });
 	  };
 	
 	  Mutator.list = function (callback) {
@@ -16094,7 +16629,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        operationName: 'list',
 	        resource: resource
 	      }
-	    }).then(_this.handleResponse.bind(_this));
+	    }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
+	      return console.log(err);
+	    });
 	  };
 	
 	  return Mutator;

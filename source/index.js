@@ -3,6 +3,7 @@ import stamp from 'react-stamp'
 import cloneDeep from 'lodash.clonedeep'
 
 import {
+  isSet,
   isFunction,
   fetch,
   mergeResponse,
@@ -79,8 +80,11 @@ export default {
 
           if (isFunction(request.callback)) {
             let clonedResource = cloneDeep(this.state[resource.name])
-            request.callback(response, clonedResource, () => {
-              this.setState({[resource.name]: clonedResource})
+            request.callback(response, clonedResource, (updatedResource) => {
+              console.log({[resource.name]: updatedResource})
+              if (isSet(updatedResource)) {
+                this.setState({[resource.name]: updatedResource})
+              }
             })
           }
           else {

@@ -4,12 +4,17 @@ export function createMutator({ key }) {
 
   let resource = this.resources[key]
 
-  let Mutator = (id) => {
+  let Mutator = (id, query) => {
 
     let subMutator = {
 
       update: (payload, callback) => this.agent.call(this, {
-        uri: resource.getUri({operationName: 'update', props: this.props, id}),
+        uri: resource.getUri({
+          operationName: 'update',
+          props: this.props,
+          id,
+          query,
+        }),
         method: resource.getMethod({operationName: 'update'}),
         payload,
         callback,
@@ -18,10 +23,16 @@ export function createMutator({ key }) {
           resource,
         },
       })
-      .then(this.handleResponse.bind(this)),
+      .then(this.handleResponse.bind(this))
+      .catch(err => console.log(err)),
 
       read: (callback) => this.agent.call(this, {
-        uri: resource.getUri({operationName: 'read', props: this.props, id}),
+        uri: resource.getUri({
+          operationName: 'read',
+          props: this.props,
+          id,
+          query,
+        }),
         method: resource.getMethod({operationName: 'read'}),
         callback,
         meta: {
@@ -29,10 +40,16 @@ export function createMutator({ key }) {
           resource,
         },
       })
-      .then(this.handleResponse.bind(this)),
+      .then(this.handleResponse.bind(this))
+      .catch(err => console.log(err)),
 
       remove: (callback) => this.agent.call(this, {
-        uri: resource.getUri({operationName: 'remove', props: this.props, id}),
+        uri: resource.getUri({
+          operationName: 'remove',
+          props: this.props,
+          id,
+          query,
+        }),
         method: resource.getMethod({operationName: 'remove'}),
         callback,
         meta: {
@@ -40,8 +57,8 @@ export function createMutator({ key }) {
           resource,
         },
       })
-      .then(this.handleResponse.bind(this)),
-
+      .then(this.handleResponse.bind(this))
+      .catch(err => console.log(err)),
     }
 
     if (isSet(resource.subs)) {
@@ -81,6 +98,7 @@ export function createMutator({ key }) {
     },
   })
   .then(this.handleResponse.bind(this))
+  .catch(err => console.log(err))
 
   Mutator.list = (callback) => this.agent.call(this, {
     uri: resource.getUri({operationName: 'list', props: this.props}),
@@ -92,6 +110,7 @@ export function createMutator({ key }) {
     },
   })
   .then(this.handleResponse.bind(this))
+  .catch(err => console.log(err))
 
   return Mutator
 

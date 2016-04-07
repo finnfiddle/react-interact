@@ -19,6 +19,7 @@ test('normalizeResource: from baseUri string', t => {
     update: { method: 'PUT', uri: ITEM_URI },
     patch: { method: 'PATCH', uri: ITEM_URI },
     remove: { method: 'DELETE', uri: ITEM_URI },
+    uid: 'id',
   }
 
   delete actual.getUri
