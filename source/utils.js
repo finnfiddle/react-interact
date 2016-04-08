@@ -159,7 +159,6 @@ const mergeResponse = ({ currentData, response, request }) => {
       case 'update':
         let updatee = data.filter(d => d[uid] === body[uid])[0]
         if (isSet(updatee)) Object.assign(updatee, body)
-        console.log({updatee, body, uid})
         break
       case 'remove':
         const index = findIndex(data, {[uid]: body[uid]})
