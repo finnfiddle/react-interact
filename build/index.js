@@ -9983,6 +9983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var normalizeResource = function normalizeResource(resourceData) {
+	
 	  var resource = {};
 	  var normalizedResourceData = undefined;
 	
@@ -9991,21 +9992,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      base: resourceData,
 	      item: '/${id}'
 	    };
-	  } else {
-	    normalizedResourceData = resourceData;
-	  }
+	  } else normalizedResourceData = resourceData;
 	
 	  var data = _extends({}, _constants.RESOURCE_DEFAULTS, normalizedResourceData);
 	
 	  resource.defaultOperation = data.defaultOperation;
 	  resource.base = data.base;
 	  resource.uid = data.uid;
+	  resource.headers = data.headers || {};
+	
 	  if (isSet(data.parentBase)) resource.parentBase = data.parentBase;
+	
 	  resource.list = normalizeOperation({
 	    resource: data,
 	    operationName: 'list',
 	    defaultMethod: 'GET'
 	  });
+	
 	  resource.create = normalizeOperation({
 	    resource: data,
 	    operationName: 'create',
@@ -10108,7 +10111,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        _this.agent.call(_this, {
 	          uri: resource.getUri({ props: props }),
-	          method: resource.getMethod({})
+	          method: resource.getMethod({}),
+	          headers: resource.headers
 	        }).then(function (_ref7) {
 	          var response = _ref7.response;
 	
@@ -14994,9 +14998,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['default'] = function (request) {
 	  return new _es6Promise.Promise(function (resolve, reject) {
 	    var method = request.method;
+	    var headers = request.headers;
 	
 	    var requestMethod = VERBS_AS_METHODS[method];
-	    var req = _superagent2['default'][requestMethod](request.uri);
+	    var req = _superagent2['default'][requestMethod](request.uri).set(headers || {});
 	
 	    if (['POST', 'PUT', 'PATCH'].indexOf(method) > -1 && (0, _utils.isSet)(request.payload)) req.send(request.payload);
 	
@@ -16546,6 +16551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      query: query
 	    }),
 	    method: resource.getMethod({ operationName: operationName }),
+	    headers: resource.headers,
 	    payload: payload,
 	    callback: callback,
 	    meta: {

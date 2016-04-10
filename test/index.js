@@ -6,5 +6,4 @@ import './utils/mergeResponse'
 import './utils/getUri'
 import './utils/getMethod'
 
-import './resourcesMutator/index'
-import './resourcesMutator/createMutator'
+import './mutator'

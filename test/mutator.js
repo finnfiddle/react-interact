@@ -1,8 +1,8 @@
 import test from 'blue-tape'
 
-import agent from '../mock/agent'
-import { createMutator } from '../../source/resourcesMutator'
-import { normalizeResource } from '../../source/utils'
+import agent from './mock/agent'
+import { createMutator } from '../source/resourcesMutator'
+import { normalizeResource } from '../source/utils'
 
 const BASE = '/test'
 const ITEM_URI = '/${id}'
