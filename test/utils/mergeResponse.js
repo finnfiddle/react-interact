@@ -87,3 +87,60 @@ test('mergeResponse: REMOVE', t => {
     .then(actual => t.deepEqual(actual, expected))
 
 })
+
+test('mergeResponse: FETCH single', t => {
+
+  const currentData = CURRENT_DATA.slice(0)
+
+  const response = {
+    body: {id: 2, name: 'test2_new'},
+  }
+
+  const request = {
+    meta: {
+      operationName: 'fetch_item',
+      resource: {
+        uid: 'id',
+      },
+    },
+  }
+
+  const expected = [
+    {id: 1, name: 'test1'},
+    {id: 2, name: 'test2_new'},
+  ]
+
+  return mergeResponse({currentData, response, request})
+    .then(actual => t.deepEqual(actual, expected))
+
+})
+
+test('mergeResponse: FETCH multiple', t => {
+
+  const currentData = CURRENT_DATA.slice(0)
+
+  const response = {
+    body: [
+      {id: 3, name: 'test3'},
+      {id: 4, name: 'test4'},
+    ],
+  }
+
+  const request = {
+    meta: {
+      operationName: 'fetch',
+      resource: {
+        uid: 'id',
+      },
+    },
+  }
+
+  const expected = [
+    {id: 3, name: 'test3'},
+    {id: 4, name: 'test4'},
+  ]
+
+  return mergeResponse({currentData, response, request})
+    .then(actual => t.deepEqual(actual, expected))
+
+})

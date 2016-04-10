@@ -10064,7 +10064,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return d[uid] === body[uid];
 	        })[0];
 	        if (isSet(updatee)) _extends(updatee, body);
-	        console.log({ updatee: updatee, body: body, uid: uid });
 	        break;
 	      case 'remove':
 	        var index = (0, _lodashFindindex2['default'])(data, _defineProperty({}, uid, body[uid]));
@@ -10128,7 +10127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*!
+	var __WEBPACK_AMD_DEFINE_RESULT__;var require;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*!
 	 * @overview es6-promise - a tiny implementation of Promises/A+.
 	 * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
 	 * @license   Licensed under MIT license
@@ -16520,7 +16519,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var resource = this.resources[key];
 	
-	  var Mutator = function Mutator(id, query) {
+	  var Mutator = function Mutator(_ref2) {
+	    var id = _ref2.id;
+	    var query = _ref2.query;
 	
 	    var subMutator = {
 	

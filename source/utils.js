@@ -66,15 +66,23 @@ const addQuery = function (query, uri) {
   }
 }
 
+const getNormalizedOperationName = (operationName) => {
+  if (operationName === 'fetch') return 'list'
+  if (operationName === 'fetch_item') return 'read'
+  return operationName
+}
+
 const getUri = function ({ operationName, id, props, query }) {
+  const _operationName = getNormalizedOperationName(operationName)
   const params = {id, props}
-  let uri = this[operationName || this.defaultOperation].uri
+  const uri = this[_operationName || this.defaultOperation].uri
   let result = `${this.getBase(params)}${matchAndReplace(uri, params)}`
   return addQuery(query, result)
 }
 
 const getMethod = function ({ operationName }) {
-  return this[operationName || this.defaultOperation].method
+  const _operationName = getNormalizedOperationName(operationName)
+  return this[_operationName || this.defaultOperation].method
 }
 
 const normalizeResource = (resourceData) => {
@@ -151,18 +159,27 @@ const mergeResponse = ({ currentData, response, request }) => {
     const uid = resource.uid
     const { body } = response
 
+    const updateItem = (collection, newItemData) => {
+      let item = collection.filter(d => d[uid] === newItemData[uid])[0]
+      if (isSet(item)) Object.assign(item, newItemData)
+    }
+
     switch (operationName) {
       case 'create':
         data.push(body)
         break
       case 'patch':
       case 'update':
-        let updatee = data.filter(d => d[uid] === body[uid])[0]
-        if (isSet(updatee)) Object.assign(updatee, body)
+      case 'fetch_item':
+        updateItem(data, body)
         break
       case 'remove':
         const index = findIndex(data, {[uid]: body[uid]})
         data.splice(index, 1)
+        break
+      case 'fetch':
+        data.length = 0
+        Array.prototype.push.apply(data, body)
         break
       default:
         break
