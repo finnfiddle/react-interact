@@ -1,5 +1,8 @@
 extends ./includes/layout.jade
 
+block navbar
+  +navbar
+  
 block content
   
   .row
@@ -11,7 +14,7 @@ block content
         
       p When defining our containers we can create subresources within resources. Subresources are defined in exactly the same way as resources and are placed in the 
         code subs
-        | &nbsp;key of the resource.
+        |  key of the resource.
       
       h3 Basic Example
       pre
@@ -48,11 +51,11 @@ block content
               },
 
               handleAddSubTodo(id) {
-                this.props.interact.todos(id).subTodos.create({})
+                this.props.interact.todos({id}).subTodos.create({})
               },
 
               handleRemoveSubTodo(id, subId) {
-                this.props.interact.todos(id).subTodos(subId).remove()
+                this.props.interact.todos({id}).subTodos({id: subId}).remove()
               },
             }
 
@@ -69,12 +72,12 @@ block content
               },
             })
             
-      p More info coming soon...
+      h3 TODO: more info
       
-      //- +space    
+      +space    
 
       
-      //- a.btn.btn-md.btn-primary(href="/guides_custom_interfaces.html") Next: Custom Interfaces
+      a.btn.btn-md.btn-primary(href="/guides_custom_interfaces.html") Next: Custom Interfaces
           
       +space    
       +space    

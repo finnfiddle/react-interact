@@ -23,11 +23,11 @@
       <div class="row">
         <div class="col-md-3"><br/><br/>
           <ul>
-            <li><a href="#installation">Installation</a></li>
-            <li><a href="#containers">Containers</a></li>
-            <li><a href="#mutations">Mutations</a></li>
-            <li><a href="#subresources">Subresources</a></li>
-            <li><a href="#custom_agents">Custom Agents/Interfaces</a></li>
+            <li><a href="/guides.html">Getting Started</a></li>
+            <li><a href="/guides_containers.html">Containers</a></li>
+            <li><a href="/guides_mutations.html">Mutations</a></li>
+            <li><a href="/guides_subresources.html">Subresources</a></li>
+            <li><a href="/guides_custom_interfaces.html">Custom Agents/Interfaces</a></li>
           </ul>
         </div>
         <div class="col-md-9">
@@ -78,7 +78,7 @@ export default createContainer(TodoList, () =&gt; ({
           </div>
           <h2>Mutations</h2>
           <p>Fetching data from the server is an important first step but what do we do about mutating data on the server. For example creating new documents/items or udpating and deleting existing ones.</p>
-          <p>Interact makes mutations easy by providing wrapped components with an  <code>interact</code>&nbsp;function prop that can be used to send requests to the backend.</p>
+          <p>Interact makes mutations easy by providing wrapped components with an  <code>interact</code> function prop that can be used to send requests to the backend.</p>
           <h3>Example</h3>
           <pre><code class="javascript">import React, { Component } from 'react'
 import { createContainer } from 'react-interact'
@@ -136,7 +136,7 @@ class TodoList extends Component {
   },
 
   handleAddSubTodo(id) {
-    this.props.interact.todos(id).subTodos.create({})
+    this.props.interact.todos({id}).subTodos.create({})
   },
 }
 
@@ -157,8 +157,8 @@ export default createContainer(TodoList, ({ id }) =&gt; ({
           <div id="custom_agents"><br/><br/>
           </div>
           <h2>Custom Agents/Interfaces</h2>
-          <p>By default Interact sends HTTP requests using <a target="_blank" href="https://visionmedia.github.io/superagent/">Superagent</a>&nbsp;under the hood but if for example you wish to provide offline-first functionality for your app or you wish to use a different protocol to HTTP you can pass a custom agent/interface to your container that will be the bridge between the frontend and the backend. </p>
-          <p>This would enable you to use alternatives like PouchDB for example or WebSockets.</p>
+          <p>By default Interact sends HTTP requests using <a target="_blank" href="https://visionmedia.github.io/superagent/">Superagent</a> under the hood but if for example you wish to provide offline-first functionality for your app or you wish to use a different protocol to HTTP you can pass a custom agent/interface to your container that will be the bridge between the frontend and the backend. </p>
+          <p>This would enable you to use alternatives like PouchDB, another HTTP agent or WebSockets for example.</p>
           <p>More info coming soon... See the defaultAgent in the source if you wish to understand better in the meantime.</p><br/><br/><br/><br/><br/><br/>
         </div>
       </div>

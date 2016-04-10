@@ -1,5 +1,8 @@
 extends ./includes/layout.jade
 
+block navbar
+  +navbar
+  
 block content
   
   .row
@@ -11,7 +14,7 @@ block content
         
       p Containers need to be configured so that they know where and how to send network requests. The second argument to 
         code Interact.createContainer()
-        | &nbsp;is an object where each key-value pair corresponds to an API resource.
+        |  is an object where each key-value pair corresponds to an API resource.
       p Example:
         
       pre
@@ -25,14 +28,14 @@ block content
               update: {method: 'PUT', uri: '/1'}, // method and uri for updating an item
               patch: {method: 'PATCH', uri: '/1'}, // method and uri for patching an item
               remove: {method: 'DELETE', uri: '/1'}, // method and uri for removing an item
+              headers: {
+                Accept: 'application/json',
+              },
               defaultOperation: 'list', // operation that is executed when component mounts
               uid: 'id', // unique identifier key for each item
             },
             ...
           })
-          
-      .callout.callout-warning 
-        h4 Notice that the uri template strings for each operation do not use back-ticks like ES6 template strings, but instead use ordinary single or double quotation marks.
         
       +space
       h4 Defaults / URI shorthand
@@ -57,11 +60,11 @@ block content
       h4 Dynamic URIs
       p Each operation URI on a resource gets evaluated as a template string. The template string gets passed the 
         code props
-        | &nbsp;of the container and the 
+        |  of the container and the 
         code id
-        | &nbsp;for the item when performing a mutation (see the 
+        |  for the item when performing a mutation (see the 
         a(href="/guides_mutations.html") Mutations Guide
-        | &nbsp; for more info).
+        |   for more info).
       p For example:
 
       pre
@@ -78,12 +81,19 @@ block content
             },
             ...
           }))
+          
+      .callout.callout-warning 
+        h4 Warning
+        
+        p Notice that the uri template strings for each operation do not use back-ticks like ES6 template strings, but instead use ordinary single or double quotation marks.
+        
+        p This is so that the template strings can be evaluated when the user wants to send a request, not when the container is created.
 
       +space    
       h4 Item keys/URIs
       p In the above example you'll notice that all operations for individual items (eg. update, remove, read, patch) have the same URI. In this case we can simplify our configuration even further by using an 
         code item
-        | &nbsp;key to configure all of the item operations at the same time.
+        |  key to configure all of the item operations at the same time.
       p For example:
 
       pre
@@ -98,16 +108,12 @@ block content
           
           
       .callout.callout-info 
-        h4 The 
+        h4 Info
+        p The 
           code create
-          | &nbsp;and 
+          |  and 
           code list
-          | &nbsp;operations use the base URI by default and can be omitted.
-        
-      .callout.callout-warning 
-        h4 Only use the
-          code item
-          | &nbsp;key if you wish to use the default HTTP verbs for each operation.
+          |  operations use the base URI by default and can be omitted.
         
       +space    
       h4 Resource URIs
@@ -134,8 +140,30 @@ block content
               update: {method: 'PUT', uri: '/${id}'},
               patch: {method: 'PATCH', uri: '/${id}'},
               remove: {method: 'DELETE', uri: '/${id}'},
+              headers: {},
               defaultOperation: 'list',
               uid: 'id',
+            },
+            ...
+          })
+          
+      +space    
+      h4 Request Headers
+      p Headers can be configured per resource. For each request sent it will attach the headers defined in the 
+        code headers
+        |  property of the resource.
+       
+      pre
+        code.javascript.
+          Interact.createContainer(WrappedComponent, {
+            resourceName: {
+              base: '/api/v1/resourceName',
+              item: '/${id}'
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'my_token',
+              },
             },
             ...
           })

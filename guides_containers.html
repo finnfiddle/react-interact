@@ -8,22 +8,33 @@
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
   <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header"><a href="/" class="navbar-brand">Interact</a></div>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/">Home</a></li>
+          <li><a href="/guides.html">Guides</a></li>
+          <li><a href="/docs.html">Docs</a></li>
+          <li><a href="">Github</a></li>
+        </ul>
+      </div>
+    </nav>
     <div class="container">
       <div class="row">
         <div class="col-md-3"><br/><br/>
           <ul>
-            <li><a href="#installation">Installation</a></li>
-            <li><a href="#containers">Containers</a></li>
-            <li><a href="#mutations">Mutations</a></li>
-            <li><a href="#subresources">Subresources</a></li>
-            <li><a href="#custom_agents">Custom Agents/Interfaces</a></li>
+            <li><a href="/guides.html">Getting Started</a></li>
+            <li><a href="/guides_containers.html">Containers</a></li>
+            <li><a href="/guides_mutations.html">Mutations</a></li>
+            <li><a href="/guides_subresources.html">Subresources</a></li>
+            <li><a href="/guides_custom_interfaces.html">Custom Agents/Interfaces</a></li>
           </ul>
         </div>
         <div class="col-md-9">
           <div class="page-header">
             <h1>Containers</h1>
           </div>
-          <p>Containers need to be configured so that they know where and how to send network requests. The second argument to <code>Interact.createContainer()</code>&nbsp;is an object where each key-value pair corresponds to an API resource.</p>
+          <p>Containers need to be configured so that they know where and how to send network requests. The second argument to <code>Interact.createContainer()</code> is an object where each key-value pair corresponds to an API resource.</p>
           <p>Example:</p>
           <pre><code class="javascript">Interact.createContainer(WrappedComponent, {
   resourceName: {
@@ -34,15 +45,15 @@
     update: {method: 'PUT', uri: '/1'}, // method and uri for updating an item
     patch: {method: 'PATCH', uri: '/1'}, // method and uri for patching an item
     remove: {method: 'DELETE', uri: '/1'}, // method and uri for removing an item
+    headers: {
+      Accept: 'application/json',
+    },
     defaultOperation: 'list', // operation that is executed when component mounts
     uid: 'id', // unique identifier key for each item
   },
   ...
 })
-</code></pre>
-          <div class="callout callout-warning"> 
-            <h4>Notice that the uri template strings for each operation do not use back-ticks like ES6 template strings, but instead use ordinary single or double quotation marks.</h4>
-          </div><br/><br/>
+</code></pre><br/><br/>
           <h4>Defaults / URI shorthand</h4>
           <p>Instead of using an object for each operation config (eg. read, list, update) we can choose to only write the URI string. The operations will use the default HTTP verbs for each. The above could have been written like this:</p>
           <pre><code class="javascript">Interact.createContainer(WrappedComponent, {
@@ -59,7 +70,7 @@
 })
 </code></pre><br/><br/>
           <h4>Dynamic URIs</h4>
-          <p>Each operation URI on a resource gets evaluated as a template string. The template string gets passed the <code>props</code>&nbsp;of the container and the <code>id</code>&nbsp;for the item when performing a mutation (see the <a href="/guides_mutations.html">Mutations Guide</a>&nbsp; for more info).</p>
+          <p>Each operation URI on a resource gets evaluated as a template string. The template string gets passed the <code>props</code> of the container and the <code>id</code> for the item when performing a mutation (see the <a href="/guides_mutations.html">Mutations Guide</a>  for more info).</p>
           <p>For example:</p>
           <pre><code class="javascript">Interact.createContainer(WrappedComponent, {
   resourceName: {
@@ -73,9 +84,14 @@
   },
   ...
 }))
-</code></pre><br/><br/>
+</code></pre>
+          <div class="callout callout-warning"> 
+            <h4>Warning</h4>
+            <p>Notice that the uri template strings for each operation do not use back-ticks like ES6 template strings, but instead use ordinary single or double quotation marks.</p>
+            <p>This is so that the template strings can be evaluated when the user wants to send a request, not when the container is created.</p>
+          </div><br/><br/>
           <h4>Item keys/URIs</h4>
-          <p>In the above example you'll notice that all operations for individual items (eg. update, remove, read, patch) have the same URI. In this case we can simplify our configuration even further by using an <code>item</code>&nbsp;key to configure all of the item operations at the same time.</p>
+          <p>In the above example you'll notice that all operations for individual items (eg. update, remove, read, patch) have the same URI. In this case we can simplify our configuration even further by using an <code>item</code> key to configure all of the item operations at the same time.</p>
           <p>For example:</p>
           <pre><code class="javascript">Interact.createContainer(WrappedComponent, {
   resourceName: {
@@ -87,10 +103,8 @@
 
 </code></pre>
           <div class="callout callout-info"> 
-            <h4>The <code>create</code>&nbsp;and <code>list</code>&nbsp;operations use the base URI by default and can be omitted.</h4>
-          </div>
-          <div class="callout callout-warning"> 
-            <h4>Only use the<code>item</code>&nbsp;key if you wish to use the default HTTP verbs for each operation.</h4>
+            <h4>Info</h4>
+            <p>The <code>create</code> and <code>list</code> operations use the base URI by default and can be omitted.</p>
           </div><br/><br/>
           <h4>Resource URIs</h4>
           <p>The previous example can be simplified even further. We can define a resource by only using the base URI string. If we used the following configuration:</p>
@@ -110,8 +124,24 @@
     update: {method: 'PUT', uri: '/${id}'},
     patch: {method: 'PATCH', uri: '/${id}'},
     remove: {method: 'DELETE', uri: '/${id}'},
+    headers: {},
     defaultOperation: 'list',
     uid: 'id',
+  },
+  ...
+})
+</code></pre><br/><br/>
+          <h4>Request Headers</h4>
+          <p>Headers can be configured per resource. For each request sent it will attach the headers defined in the <code>headers</code> property of the resource.</p>
+          <pre><code class="javascript">Interact.createContainer(WrappedComponent, {
+  resourceName: {
+    base: '/api/v1/resourceName',
+    item: '/${id}'
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: 'my_token',
+    },
   },
   ...
 })

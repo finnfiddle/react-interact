@@ -73,7 +73,7 @@ block content
       
       p Interact makes mutations easy by providing wrapped components with an  
         code interact
-        | &nbsp;function prop that can be used to send requests to the backend.
+        |  function prop that can be used to send requests to the backend.
         
       h3 Example
       
@@ -145,7 +145,7 @@ block content
               },
 
               handleAddSubTodo(id) {
-                this.props.interact.todos(id).subTodos.create({})
+                this.props.interact.todos({id}).subTodos.create({})
               },
             }
 
@@ -171,9 +171,9 @@ block content
       h2 Custom Agents/Interfaces
       p By default Interact sends HTTP requests using 
         a(target="_blank" href="https://visionmedia.github.io/superagent/") Superagent
-        | &nbsp;under the hood but if for example you wish to provide offline-first functionality for your app or you wish to use a different protocol to HTTP you can pass a custom agent/interface to your container that will be the bridge between the frontend and the backend. 
+        |  under the hood but if for example you wish to provide offline-first functionality for your app or you wish to use a different protocol to HTTP you can pass a custom agent/interface to your container that will be the bridge between the frontend and the backend. 
       
-      p This would enable you to use alternatives like PouchDB for example or WebSockets.
+      p This would enable you to use alternatives like PouchDB, another HTTP agent or WebSockets for example.
       
       p More info coming soon... See the defaultAgent in the source if you wish to understand better in the meantime.
       //- h3 Example

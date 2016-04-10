@@ -1,5 +1,8 @@
 extends ./includes/layout.jade
 
+block navbar
+  +navbar
+  
 block content
   
   .row
@@ -13,11 +16,11 @@ block content
       
       p Interact gives us the power to perform CRUD operations on our resources defined by our containers by passing a prop 
         code interact
-        | &nbsp;to the wrapped component.
+        |  to the wrapped component.
         
       p The 
         code interact
-        | &nbsp;prop exposes a fluent API where resources can be mutated and read using CRUD operations (read, update, create, remove, list).
+        |  prop exposes a fluent API where resources can be mutated and read using CRUD operations (read, update, create, remove, list).
 
 
       h3 Create
@@ -56,7 +59,7 @@ block content
       h3 Update
       p In this example we update/toggle the 
         code done
-        | &nbsp;property of the clicked Todo.
+        |  property of the clicked Todo.
       pre
         code.javascript
           :escape
@@ -87,7 +90,7 @@ block content
               },
 
               handleUpdateTodo({id, payload}) {
-                this.props.interact.todos(id).update(payload)
+                this.props.interact.todos({id}).update(payload)
               },
             }
 
@@ -125,8 +128,51 @@ block content
               },
 
               handleRemoveTodo(id) {
-                this.props.interact.todos(id).remove()
+                this.props.interact.todos({id}).remove()
               },
+            }
+
+            export default createContainer(TodoList, {
+              todos: '/api/v1/todos',
+            })
+      
+      +space    
+      
+      
+      h3 List
+      p This example shows an example of typeahead functionality using the 
+        code list
+        |  method.
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <div>
+                    <input onChange={this.handleSearch.bind(this)} />
+                    <ul>
+                      {this.state.todos.map(todo => (
+                        <li key={todo.id}>{todo.title}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+              },
+                
+              handleSearch(event) {
+                this.props.interact
+                  .todos({query: {search: event.target.value}})
+                  .list((response, collection, done) => {
+                    this.setState({todos: response.body})
+                    done()
+                  })
+              },
+
             }
 
             export default createContainer(TodoList, {
@@ -134,17 +180,19 @@ block content
             })
             
       .callout.callout-info
-        h4 Here we have only shown you examples of the mutation CRUD operations (eg. 
-          code create
-          | , 
-          code update
-          | &nbsp;and 
-          code delete
-          | ) but all are available. You can also 
-          code read
-          | &nbsp;and
+        h4 Info
+        
+        p The 
           code list
-          | .
+          |  method will not update the collection that gets passed as a prop to the wrapped component. If you wish to list and update the collection at the same time use the 
+          code fetch
+          |  method instead.
+          
+      +space    
+          
+      h3 TODO: Read
+      h3 TODO: Fetch Single
+      h3 TODO: Fetch Multiple
       
       +space    
       
@@ -182,7 +230,7 @@ block content
               },
 
               handleMoveTodoToTop(todo) {
-                this.props.interact.todos(id).update(
+                this.props.interact.todos({id}).update(
                   {position: 0},
                   (response, collection, updateCollection) => {
                     this.props.interact.todos.fetch()
@@ -198,7 +246,9 @@ block content
       +space   
       
       h3 Queries
-      p Query strings can also be added to request urls by passing an object of key/value pairs as the second argument to the method that selects the item in the resource.
+      p Query strings can also be added to request urls by specifying a query property on the object that is passed to the method that selects the item in the resource. Each key-value pair is mapped to the uri query string using 
+        a(href="https://github.com/ljharb/qs" target="_blank") qs
+        |  behind the scenes.
       
       pre
         code.javascript
@@ -224,7 +274,7 @@ block content
               },
               
               handleSearch(event) {
-                this.props.interact.todos(id, {searchTerm: event.target.value}).fetch()
+                this.props.interact.todos({id, query: {search: event.target.value}}).fetch()
               },
             }
 
