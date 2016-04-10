@@ -1,7 +1,7 @@
 {
   "name": "react-interact",
   "description": "Declarative REST data fetching for React",
-  "version": "0.0.5",
+  "version": "0.1.5",
   "main": "build/index.js",
   "scripts": {
     "init": "rimraf .validate.json && rimraf .jshintrc",
