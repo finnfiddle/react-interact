@@ -17,6 +17,7 @@ const handleMutation = function ({
       query,
     }),
     method: resource.getMethod({operationName}),
+    headers: resource.headers,
     payload,
     callback,
     meta: {

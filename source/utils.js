@@ -86,6 +86,7 @@ const getMethod = function ({ operationName }) {
 }
 
 const normalizeResource = (resourceData) => {
+
   let resource = {}
   let normalizedResourceData
 
@@ -95,21 +96,23 @@ const normalizeResource = (resourceData) => {
       item: '/${id}',
     }
   }
-  else {
-    normalizedResourceData = resourceData
-  }
+  else normalizedResourceData = resourceData
 
   const data = Object.assign({}, RESOURCE_DEFAULTS, normalizedResourceData)
 
   resource.defaultOperation = data.defaultOperation
   resource.base = data.base
   resource.uid = data.uid
+  resource.headers = data.headers || {}
+
   if (isSet(data.parentBase)) resource.parentBase = data.parentBase
+
   resource.list = normalizeOperation({
     resource: data,
     operationName: 'list',
     defaultMethod: 'GET',
   })
+
   resource.create = normalizeOperation({
     resource: data,
     operationName: 'create',
@@ -203,6 +206,7 @@ const fetch = function ({ props }) {
           .agent.call(this, {
             uri: resource.getUri({props}),
             method: resource.getMethod({}),
+            headers: resource.headers,
           })
           .then(({ response }) => {
             result[key] = response.body

@@ -10,6 +10,7 @@ test('fetch: default', function (t) {
 
   const expected = {
     [KEY]: {
+      headers: {},
       uri: BASE,
       method: 'GET',
     },

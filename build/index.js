@@ -9956,14 +9956,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 	
+	var getNormalizedOperationName = function getNormalizedOperationName(operationName) {
+	  if (operationName === 'fetch') return 'list';
+	  if (operationName === 'fetch_item') return 'read';
+	  return operationName;
+	};
+	
 	var getUri = function getUri(_ref3) {
 	  var operationName = _ref3.operationName;
 	  var id = _ref3.id;
 	  var props = _ref3.props;
 	  var query = _ref3.query;
 	
+	  var _operationName = getNormalizedOperationName(operationName);
 	  var params = { id: id, props: props };
-	  var uri = this[operationName || this.defaultOperation].uri;
+	  var uri = this[_operationName || this.defaultOperation].uri;
 	  var result = '' + this.getBase(params) + matchAndReplace(uri, params);
 	  return addQuery(query, result);
 	};
@@ -9971,7 +9978,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var getMethod = function getMethod(_ref4) {
 	  var operationName = _ref4.operationName;
 	
-	  return this[operationName || this.defaultOperation].method;
+	  var _operationName = getNormalizedOperationName(operationName);
+	  return this[_operationName || this.defaultOperation].method;
 	};
 	
 	var normalizeResource = function normalizeResource(resourceData) {
@@ -10054,20 +10062,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var uid = resource.uid;
 	    var body = response.body;
 	
+	    var updateItem = function updateItem(collection, newItemData) {
+	      var item = collection.filter(function (d) {
+	        return d[uid] === newItemData[uid];
+	      })[0];
+	      if (isSet(item)) _extends(item, newItemData);
+	    };
+	
 	    switch (operationName) {
 	      case 'create':
 	        data.push(body);
 	        break;
 	      case 'patch':
 	      case 'update':
-	        var updatee = data.filter(function (d) {
-	          return d[uid] === body[uid];
-	        })[0];
-	        if (isSet(updatee)) _extends(updatee, body);
+	      case 'fetch_item':
+	        updateItem(data, body);
 	        break;
 	      case 'remove':
 	        var index = (0, _lodashFindindex2['default'])(data, _defineProperty({}, uid, body[uid]));
 	        data.splice(index, 1);
+	        break;
+	      case 'fetch':
+	        data.length = 0;
+	        Array.prototype.push.apply(data, body);
 	        break;
 	      default:
 	        break;
@@ -10127,7 +10144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;var require;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*!
+	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*!
 	 * @overview es6-promise - a tiny implementation of Promises/A+.
 	 * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
 	 * @license   Licensed under MIT license
@@ -16512,74 +16529,99 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _utils = __webpack_require__(216);
 	
-	function createMutator(_ref) {
+	var handleMutation = function handleMutation(_ref) {
+	  var operationName = _ref.operationName;
+	  var resource = _ref.resource;
+	  var id = _ref.id;
+	  var query = _ref.query;
+	  var props = _ref.props;
+	  var payload = _ref.payload;
+	  var callback = _ref.callback;
+	
+	  return this.agent.call(this, {
+	    uri: resource.getUri({
+	      operationName: operationName,
+	      props: this.props,
+	      id: id,
+	      query: query
+	    }),
+	    method: resource.getMethod({ operationName: operationName }),
+	    payload: payload,
+	    callback: callback,
+	    meta: {
+	      operationName: operationName,
+	      resource: resource
+	    }
+	  }).then(this.handleResponse.bind(this))['catch'](function (err) {
+	    return console.log(err);
+	  });
+	};
+	
+	function createMutator(_ref2) {
 	  var _this = this;
 	
-	  var key = _ref.key;
+	  var key = _ref2.key;
 	
 	  var resource = this.resources[key];
 	
-	  var Mutator = function Mutator(_ref2) {
-	    var id = _ref2.id;
-	    var query = _ref2.query;
+	  var Mutator = function Mutator(_ref3) {
+	    var id = _ref3.id;
+	    var query = _ref3.query;
 	
 	    var subMutator = {
 	
-	      update: function update(payload, callback) {
-	        return _this.agent.call(_this, {
-	          uri: resource.getUri({
-	            operationName: 'update',
-	            props: _this.props,
-	            id: id,
-	            query: query
-	          }),
-	          method: resource.getMethod({ operationName: 'update' }),
-	          payload: payload,
-	          callback: callback,
-	          meta: {
-	            operationName: 'update',
-	            resource: resource
-	          }
-	        }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
-	          return console.log(err);
+	      read: function read(callback) {
+	        return handleMutation.call(_this, {
+	          operationName: 'read',
+	          resource: resource,
+	          id: id,
+	          query: query,
+	          props: _this.props,
+	          callback: callback
 	        });
 	      },
 	
-	      read: function read(callback) {
-	        return _this.agent.call(_this, {
-	          uri: resource.getUri({
-	            operationName: 'read',
-	            props: _this.props,
-	            id: id,
-	            query: query
-	          }),
-	          method: resource.getMethod({ operationName: 'read' }),
-	          callback: callback,
-	          meta: {
-	            operationName: 'read',
-	            resource: resource
-	          }
-	        }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
-	          return console.log(err);
+	      fetch: function fetch(callback) {
+	        return handleMutation.call(_this, {
+	          operationName: 'fetch_item',
+	          resource: resource,
+	          id: id,
+	          query: query,
+	          props: _this.props,
+	          callback: callback
+	        });
+	      },
+	
+	      update: function update(payload, callback) {
+	        return handleMutation.call(_this, {
+	          operationName: 'update',
+	          resource: resource,
+	          id: id,
+	          query: query,
+	          props: _this.props,
+	          payload: payload,
+	          callback: callback
 	        });
 	      },
 	
 	      remove: function remove(callback) {
-	        return _this.agent.call(_this, {
-	          uri: resource.getUri({
-	            operationName: 'remove',
-	            props: _this.props,
-	            id: id,
-	            query: query
-	          }),
-	          method: resource.getMethod({ operationName: 'remove' }),
-	          callback: callback,
-	          meta: {
-	            operationName: 'remove',
-	            resource: resource
-	          }
-	        }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
-	          return console.log(err);
+	        return handleMutation.call(_this, {
+	          operationName: 'remove',
+	          resource: resource,
+	          id: id,
+	          query: query,
+	          props: _this.props,
+	          callback: callback
+	        });
+	      },
+	
+	      list: function list(callback) {
+	        return handleMutation.call(_this, {
+	          operationName: 'list',
+	          resource: resource,
+	          query: query,
+	          props: _this.props,
+	          callback: callback
 	        });
 	      }
 	    };
@@ -16607,31 +16649,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  Mutator.create = function (payload, callback) {
-	    return _this.agent.call(_this, {
-	      uri: resource.getUri({ operationName: 'create', props: _this.props }),
-	      method: resource.getMethod({ operationName: 'create' }),
+	    return handleMutation.call(_this, {
+	      operationName: 'create',
+	      resource: resource,
+	      props: _this.props,
 	      payload: payload,
-	      callback: callback,
-	      meta: {
-	        operationName: 'create',
-	        resource: resource
-	      }
-	    }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
-	      return console.log(err);
+	      callback: callback
 	    });
 	  };
 	
 	  Mutator.list = function (callback) {
-	    return _this.agent.call(_this, {
-	      uri: resource.getUri({ operationName: 'list', props: _this.props }),
-	      method: resource.getMethod({ operationName: 'list' }),
-	      callback: callback,
-	      meta: {
-	        operationName: 'list',
-	        resource: resource
-	      }
-	    }).then(_this.handleResponse.bind(_this))['catch'](function (err) {
-	      return console.log(err);
+	    return handleMutation.call(_this, {
+	      operationName: 'list',
+	      resource: resource,
+	      props: _this.props,
+	      callback: callback
+	    });
+	  };
+	
+	  Mutator.fetch = function (callback) {
+	    return handleMutation.call(_this, {
+	      operationName: 'fetch',
+	      resource: resource,
+	      props: _this.props,
+	      callback: callback
 	    });
 	  };
 	

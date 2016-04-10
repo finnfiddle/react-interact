@@ -12,10 +12,10 @@ const VERBS_AS_METHODS = {
 
 export default (request) => new Promise((resolve, reject) => {
 
-  const { method } = request
+  const { method, headers } = request
 
   const requestMethod = VERBS_AS_METHODS[method]
-  let req = agent[requestMethod](request.uri)
+  let req = agent[requestMethod](request.uri).set(headers || {})
 
   if (
     ['POST', 'PUT', 'PATCH'].indexOf(method) > -1 &&

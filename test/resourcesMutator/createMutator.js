@@ -18,7 +18,7 @@ const resources = {
   [KEY]: normalizeResource(BASE),
 }
 
-test('createMutator: CREATE', t => {
+test('Mutator: CREATE', t => {
 
   let expected = {
     response: {
@@ -27,6 +27,7 @@ test('createMutator: CREATE', t => {
         method: 'POST',
         payload: PAYLOAD,
         uri: `${BASE}`,
+        headers: {},
         meta: {
           operationName: 'create',
           resource: resources[KEY],
@@ -55,7 +56,7 @@ test('createMutator: CREATE', t => {
 
 })
 
-test('createMutator: UPDATE', t => {
+test('Mutator: UPDATE', t => {
 
   let expected = {
     response: {
@@ -64,6 +65,7 @@ test('createMutator: UPDATE', t => {
         method: 'PUT',
         payload: PAYLOAD,
         uri: `${BASE}/1`,
+        headers: {},
         meta: {
           operationName: 'update',
           resource: resources[KEY],
@@ -92,7 +94,7 @@ test('createMutator: UPDATE', t => {
 
 })
 
-test('createMutator: READ', t => {
+test('Mutator: READ', t => {
 
   let expected = {
     response: {
@@ -101,6 +103,7 @@ test('createMutator: READ', t => {
         method: 'GET',
         uri: `${BASE}/1`,
         payload: undefined,
+        headers: {},
         meta: {
           operationName: 'read',
           resource: resources[KEY],
@@ -129,7 +132,7 @@ test('createMutator: READ', t => {
 
 })
 
-test('createMutator: REMOVE', t => {
+test('Mutator: REMOVE', t => {
 
   let expected = {
     response: {
@@ -138,6 +141,7 @@ test('createMutator: REMOVE', t => {
         method: 'DELETE',
         uri: `${BASE}/1`,
         payload: undefined,
+        headers: {},
         meta: {
           operationName: 'remove',
           resource: resources[KEY],
@@ -166,7 +170,7 @@ test('createMutator: REMOVE', t => {
 
 })
 
-test('createMutator: LIST', t => {
+test('Mutator: LIST', t => {
 
   let expected = {
     response: {
@@ -175,6 +179,7 @@ test('createMutator: LIST', t => {
         method: 'GET',
         uri: `${BASE}`,
         payload: undefined,
+        headers: {},
         meta: {
           operationName: 'list',
           resource: resources[KEY],
@@ -203,7 +208,7 @@ test('createMutator: LIST', t => {
 
 })
 
-test('createMutator: SUB CREATE', t => {
+test('Mutator: SUB CREATE', t => {
 
   const resource = normalizeResource({
     base: BASE,
@@ -223,6 +228,7 @@ test('createMutator: SUB CREATE', t => {
         method: 'POST',
         payload: PAYLOAD,
         uri: `${BASE}/1${SUB_BASE}`,
+        headers: {},
         meta: {
           operationName: 'create',
           resource: resource.subs[SUB_KEY],
@@ -253,7 +259,7 @@ test('createMutator: SUB CREATE', t => {
 
 })
 
-test('createMutator: SUB UPDATE', t => {
+test('Mutator: SUB UPDATE', t => {
 
   const resource = normalizeResource({
     base: BASE,
@@ -273,6 +279,7 @@ test('createMutator: SUB UPDATE', t => {
         method: 'PUT',
         payload: PAYLOAD,
         uri: `${BASE}/1${SUB_BASE}/2`,
+        headers: {},
         meta: {
           operationName: 'update',
           resource: resource.subs[SUB_KEY],
@@ -305,7 +312,7 @@ test('createMutator: SUB UPDATE', t => {
 
 })
 
-test('createMutator: FETCH multiple', t => {
+test('Mutator: FETCH multiple', t => {
 
   const resource = normalizeResource({
     base: BASE,
@@ -319,6 +326,7 @@ test('createMutator: FETCH multiple', t => {
         method: 'GET',
         uri: `${BASE}`,
         payload: undefined,
+        headers: {},
         meta: {
           operationName: 'fetch',
           resource,
@@ -349,7 +357,7 @@ test('createMutator: FETCH multiple', t => {
 
 })
 
-test('createMutator: FETCH single', t => {
+test('Mutator: FETCH single', t => {
 
   const resource = normalizeResource({
     base: BASE,
@@ -363,6 +371,7 @@ test('createMutator: FETCH single', t => {
         method: 'GET',
         uri: `${BASE}/1`,
         payload: undefined,
+        headers: {},
         meta: {
           operationName: 'fetch_item',
           resource,
