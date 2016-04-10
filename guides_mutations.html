@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <title>Interact</title>
-    <link rel="stylesheet" href="/react-interact//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
-    <link rel="stylesheet" href="/react-interact/css/main.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/default.min.css">
+    <link rel="stylesheet" href="/css/main.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
   </head>
@@ -121,7 +121,10 @@ class TodoList extends Component {
 export default createContainer(TodoList, {
   todos: '/api/v1/todos',
 })
-</code></pre><br/><br/>
+</code></pre>
+          <div class="callout callout-info">
+            <h4>Here we have only shown you examples of the mutation CRUD operations (eg. <code>create</code>, <code>update</code>&nbsp;and <code>delete</code>) but all are available. You can also <code>read</code>&nbsp;and<code>list</code>.</h4>
+          </div><br/><br/>
           <h3>Callbacks</h3>
           <p>What happens when mutating one object has an effect on other items in the collection? If for example we change the position of an item in a list, and on the backend we also update the positions of other items in the list - these other changes would need to be synced with the frontend.</p>
           <p>One way of doing this is sending another network request that retrieves the updated list of items. There are other ways but we will look at this way for illustration purposes.</p>
@@ -151,16 +154,50 @@ class TodoList extends Component {
   },
 
   handleMoveTodoToTop(todo) {
-    this.props.interact.todos(id).update({position: 0}, () =&gt; {
-      this.props.interact.todos.list()
-    })
+    this.props.interact.todos(id).update(
+      {position: 0},
+      (response, collection, updateCollection) =&gt; {
+        this.props.interact.todos.fetch()
+      }
+    )
   },
 }
 
 export default createContainer(TodoList, {
   todos: '/api/v1/todos',
 })
-</code></pre><br/><br/><a href="/react-interact/guides_subresources.html" class="btn btn-md btn-primary">Next: Subresources</a><br/><br/><br/><br/><br/><br/>
+</code></pre><br/><br/>
+          <h3>Queries</h3>
+          <p>Query strings can also be added to request urls by passing an object of key/value pairs as the second argument to the method that selects the item in the resource.</p>
+          <pre><code class="javascript">import React, { Component } from 'react'
+import { createContainer } from 'react-interact'
+
+class TodoList extends Component {
+
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;input onChange={this.handleSearch.bind(this)} /&gt;
+        &lt;ul&gt;
+          {
+            this.props.todos.map(todo =&gt; (
+              &lt;li key={todo.id}&gt;{todo.title}&lt;/li&gt;
+            ))
+          }
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    )
+  },
+  
+  handleSearch(event) {
+    this.props.interact.todos(id, {searchTerm: event.target.value}).fetch()
+  },
+}
+
+export default createContainer(TodoList, {
+  todos: '/api/v1/todos',
+})
+</code></pre><br/><br/><a href="/guides_subresources.html" class="btn btn-md btn-primary">Next: Subresources</a><br/><br/><br/><br/><br/><br/>
         </div>
       </div>
     </div>

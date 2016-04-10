@@ -132,6 +132,19 @@ block content
             export default createContainer(TodoList, {
               todos: '/api/v1/todos',
             })
+            
+      .callout.callout-info
+        h4 Here we have only shown you examples of the mutation CRUD operations (eg. 
+          code create
+          | , 
+          code update
+          | &nbsp;and 
+          code delete
+          | ) but all are available. You can also 
+          code read
+          | &nbsp;and
+          code list
+          | .
       
       +space    
       
@@ -169,9 +182,12 @@ block content
               },
 
               handleMoveTodoToTop(todo) {
-                this.props.interact.todos(id).update({position: 0}, () => {
-                  this.props.interact.todos.list()
-                })
+                this.props.interact.todos(id).update(
+                  {position: 0},
+                  (response, collection, updateCollection) => {
+                    this.props.interact.todos.fetch()
+                  }
+                )
               },
             }
 
@@ -179,7 +195,45 @@ block content
               todos: '/api/v1/todos',
             })
             
-      +space    
+      +space   
+      
+      h3 Queries
+      p Query strings can also be added to request urls by passing an object of key/value pairs as the second argument to the method that selects the item in the resource.
+      
+      pre
+        code.javascript
+          :escape
+            import React, { Component } from 'react'
+            import { createContainer } from 'react-interact'
+
+            class TodoList extends Component {
+
+              render() {
+                return (
+                  <div>
+                    <input onChange={this.handleSearch.bind(this)} />
+                    <ul>
+                      {
+                        this.props.todos.map(todo => (
+                          <li key={todo.id}>{todo.title}</li>
+                        ))
+                      }
+                    </ul>
+                  </div>
+                )
+              },
+              
+              handleSearch(event) {
+                this.props.interact.todos(id, {searchTerm: event.target.value}).fetch()
+              },
+            }
+
+            export default createContainer(TodoList, {
+              todos: '/api/v1/todos',
+            })
+            
+      +space   
+       
       
       a.btn.btn-md.btn-primary(href=uri_prefix+"/guides_subresources.html") Next: Subresources
           
