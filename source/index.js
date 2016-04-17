@@ -5,15 +5,27 @@ import cloneDeep from 'lodash.clonedeep'
 import {
   isSet,
   isFunction,
-  fetch,
-  mergeResponse,
   normalizeResource,
   addNamesToResources,
 } from './utils'
+import fetch from './fetch'
+import mergeResponse from './mergeResponse'
+import createResourcesMutator from './createResourcesMutator'
 import DefaultAgent from './defaultAgent'
-import ResourcesMutator from './resourcesMutator'
 
-export default {
+let Interact = {
+
+  state: {},
+  containers: [],
+
+  setState(state) {
+    Object.assign(Interact.state, state)
+    Interact.containers.forEach(container => container.updateState(Interact.state))
+  },
+
+  getState() {
+    return Object.assign({}, Interact.state)
+  },
 
   createContainer(WrappedElement, resources, agent) {
     return stamp(React)
@@ -30,11 +42,11 @@ export default {
           addNamesToResources(this.resources)
 
           this.agent = agent || DefaultAgent
+
+          Interact.containers.push(this)
         },
 
-        state: {
-          _hasFetched: false,
-        },
+        state: Object.assign({}, Interact.getState(), {_hasFetched: false}),
 
         componentDidMount() {
           this.fetch({props: this.props})
@@ -68,8 +80,12 @@ export default {
           return result
         },
 
+        updateState(state) {
+          this.setState(state)
+        },
+
         requestHandler() {
-          return ResourcesMutator.call(this)
+          return createResourcesMutator.call(this)
         },
 
         handleResponse({
@@ -78,22 +94,26 @@ export default {
         }) {
           const { resource } = request.meta
 
-          if (isFunction(request.callback)) {
-            let clonedResource = cloneDeep(this.state[resource.name])
-            request.callback(response, clonedResource, (updatedResource) => {
-              console.log({[resource.name]: updatedResource})
-              if (isSet(updatedResource)) {
-                this.setState({[resource.name]: updatedResource})
-              }
-            })
+          if (resource.isResource) {
+            if (isFunction(request.callback)) {
+              let clonedResource = cloneDeep(this.state[resource.name])
+              request.callback(response, clonedResource, (updatedResource) => {
+                if (isSet(updatedResource)) {
+                  this.setState({[resource.name]: updatedResource})
+                }
+              })
+            }
+            else {
+              mergeResponse({
+                currentData: this.state[resource.name],
+                response,
+                request,
+              })
+              .then(result => this.setState({[resource.name]: result}))
+            }
           }
-          else {
-            mergeResponse({
-              currentData: this.state[resource.name],
-              response,
-              request,
-            })
-            .then(result => this.setState({[resource.name]: result}))
+          else if (isFunction(request.callback)) {
+            request.callback(response)
           }
         },
 
@@ -109,3 +129,5 @@ export default {
   },
 
 }
+
+export default Interact

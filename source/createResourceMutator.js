@@ -9,15 +9,24 @@ const handleMutation = function ({
   payload,
   callback,
 }) {
+
+  const uri = resource.getUri({
+    operationName,
+    props,
+    id,
+    query,
+  })
+
+  const method = resource.getMethod({operationName})
+
+  const headers = resource.headers
+
+  resource.onRequest({uri, method, headers})
+
   return this.agent.call(this, {
-    uri: resource.getUri({
-      operationName,
-      props: this.props,
-      id,
-      query,
-    }),
-    method: resource.getMethod({operationName}),
-    headers: resource.headers,
+    uri,
+    method,
+    headers,
     payload,
     callback,
     meta: {
@@ -25,11 +34,17 @@ const handleMutation = function ({
       resource,
     },
   })
-  .then(this.handleResponse.bind(this))
-  .catch(err => console.log(err))
+  .then(({ response, request }) => {
+    resource.onSuccess({uri, method, headers, response})
+    this.handleResponse.call(this, {response, request})
+  })
+  .catch(({ response, request }) => {
+    resource.onFailure({uri, method, headers, response})
+    this.handleResponse.call(this, {response, request})
+  })
 }
 
-export function createMutator({ key }) {
+export default function createResourceMutator({ key }) {
 
   let resource = this.resources[key]
 
@@ -91,7 +106,7 @@ export function createMutator({ key }) {
           id,
         })
 
-        subMutator[sk] = createMutator.call(
+        subMutator[sk] = createResourceMutator.call(
           {
             props: this.props,
             resources: resource.subs,
@@ -133,19 +148,4 @@ export function createMutator({ key }) {
 
   return Mutator
 
-}
-
-export default function() {
-
-  let mutator = {}
-
-  for (let key in this.resources) {
-
-    mutator[key] = createMutator.call(this, {
-      key,
-    })
-
-  }
-
-  return mutator
 }

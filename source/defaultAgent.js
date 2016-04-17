@@ -12,19 +12,19 @@ const VERBS_AS_METHODS = {
 
 export default (request) => new Promise((resolve, reject) => {
 
-  const { method, headers } = request
+  const { method, headers, uri, payload } = request
 
   const requestMethod = VERBS_AS_METHODS[method]
-  let req = agent[requestMethod](request.uri).set(headers || {})
+  let req = agent[requestMethod](uri).set(headers || {})
 
   if (
     ['POST', 'PUT', 'PATCH'].indexOf(method) > -1 &&
-    isSet(request.payload)
-  ) req.send(request.payload)
+    isSet(payload)
+  ) req.send(payload)
 
   req.end((err, response) => {
-    if (isSet(err)) reject(err)
-    else if (!response.ok) reject(response.body)
+    console.log({err, response})
+    if (!response.ok) reject({request, response})
     else resolve({request, response})
   })
 

@@ -6,4 +6,5 @@
     "disallowKeywordsOnNewLine": false,
     "disallowTrailingWhitespace": false,
     "requireShorthandArrowFunctions": false,
+    "safeContextKeyword": false,
 }

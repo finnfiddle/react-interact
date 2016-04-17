@@ -1,9 +1,6 @@
-import { Promise } from 'es6-promise'
+// import { Promise } from 'es6-promise'
 import qs from 'qs'
-import cloneDeep from 'lodash.clonedeep'
-import findIndex from 'lodash.findindex'
 import get from 'lodash.get'
-import { map as asyncMap } from 'nimble'
 
 import { OPERATIONS, RESOURCE_DEFAULTS } from './constants'
 
@@ -12,6 +9,7 @@ const RE = /\$\{(.[^}]*)\}/
 const isSet = (val) => typeof val !== 'undefined' && val !== null
 const isString = (val) => typeof val === 'string'
 const isFunction = (val) => typeof val === 'function'
+const noop = () => undefined
 
 const normalizeOperation = ({ resource, operationName, defaultMethod }) => {
   let result
@@ -85,9 +83,26 @@ const getMethod = function ({ operationName }) {
   return this[_operationName || this.defaultOperation].method
 }
 
+const normalizeNonResource = (nonResourceData) => {
+  let nonResource = Object.assign({}, nonResourceData, {isResource: false})
+
+  nonResource.onRequest = isSet(nonResourceData.onRequest) ?
+    nonResourceData.onRequest.bind(nonResource) : noop
+  nonResource.onSuccess = isSet(nonResourceData.onSuccess) ?
+    nonResourceData.onSuccess.bind(nonResource) : noop
+  nonResource.onFailure = isSet(nonResourceData.onFailure) ?
+    nonResourceData.onFailure.bind(nonResource) : noop
+
+  return nonResource
+}
+
 const normalizeResource = (resourceData) => {
 
-  let resource = {}
+  if (isSet(resourceData.uri)) return normalizeNonResource(resourceData)
+
+  let resource = {
+    isResource: true,
+  }
   let normalizedResourceData
 
   if (isString(resourceData)) {
@@ -104,6 +119,10 @@ const normalizeResource = (resourceData) => {
   resource.base = data.base
   resource.uid = data.uid
   resource.headers = data.headers || {}
+
+  resource.onRequest = isSet(data.onRequest) ? data.onRequest.bind(resource) : noop
+  resource.onSuccess = isSet(data.onSuccess) ? data.onSuccess.bind(resource) : noop
+  resource.onFailure = isSet(data.onFailure) ? data.onFailure.bind(resource) : noop
 
   if (isSet(data.parentBase)) resource.parentBase = data.parentBase
 
@@ -154,86 +173,15 @@ const addNamesToResources = (resources) => {
   for (let name in resources) resources[name].name = name
 }
 
-const mergeResponse = ({ currentData, response, request }) => {
-
-  return new Promise(resolve => {
-    let data = cloneDeep(currentData)
-    const { resource, operationName } = request.meta
-    const uid = resource.uid
-    const { body } = response
-
-    const updateItem = (collection, newItemData) => {
-      let item = collection.filter(d => d[uid] === newItemData[uid])[0]
-      if (isSet(item)) Object.assign(item, newItemData)
-    }
-
-    switch (operationName) {
-      case 'create':
-        data.push(body)
-        break
-      case 'patch':
-      case 'update':
-      case 'fetch_item':
-        updateItem(data, body)
-        break
-      case 'remove':
-        const index = findIndex(data, {[uid]: body[uid]})
-        data.splice(index, 1)
-        break
-      case 'fetch':
-        data.length = 0
-        Array.prototype.push.apply(data, body)
-        break
-      default:
-        break
-    }
-
-    resolve(data)
-  })
-}
-
-const fetch = function ({ props }) {
-
-  let result = {}
-
-  return new Promise((resolve, reject) => {
-    asyncMap(this.resources, (resource, key, next) => {
-      if (!isSet(resource.defaultOperation)) {
-        next()
-      }
-      else {
-        this
-          .agent.call(this, {
-            uri: resource.getUri({props}),
-            method: resource.getMethod({}),
-            headers: resource.headers,
-          })
-          .then(({ response }) => {
-            result[key] = response.body
-            next(null)
-          })
-          .catch(err => console.log(err))
-      }
-
-    }, (err) => {
-      if (err) reject(err)
-      else resolve(result)
-    })
-  })
-
-}
-
 export default {
   isSet,
   isString,
   isFunction,
-  fetch,
   getBase,
   getUri,
   getMethod,
   normalizeResource,
   normalizeOperation,
   addNamesToResources,
-  mergeResponse,
   addQuery,
 }
