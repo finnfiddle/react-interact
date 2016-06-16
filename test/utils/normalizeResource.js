@@ -1,6 +1,6 @@
 import test from 'blue-tape'
 
-import { normalizeResource } from '../../source/utils'
+import { normalizeResource, noop } from '../../source/utils'
 
 const BASE = '/test'
 const ITEM_URI = '/${id}'
@@ -21,6 +21,10 @@ test('normalizeResource: from baseUri string', t => {
     patch: { method: 'PATCH', uri: ITEM_URI },
     remove: { method: 'DELETE', uri: ITEM_URI },
     uid: 'id',
+    isResource: true,
+    onFailure: noop,
+    onSuccess: noop,
+    onRequest: noop,
   }
 
   delete actual.getUri
@@ -51,6 +55,10 @@ test('normalizeResource: from item config', t => {
     patch: { method: 'PATCH', uri: ITEM_URI },
     remove: { method: 'DELETE', uri: ITEM_URI },
     uid: 'id',
+    isResource: true,
+    onFailure: noop,
+    onSuccess: noop,
+    onRequest: noop,
   }
 
   delete actual.getUri
@@ -81,6 +89,10 @@ test('normalizeResource: from item string', t => {
     patch: undefined,
     remove: undefined,
     uid: 'id',
+    isResource: true,
+    onFailure: noop,
+    onSuccess: noop,
+    onRequest: noop,
   }
 
   delete actual.getUri
@@ -114,6 +126,10 @@ test('normalizeResource: headers', t => {
     patch: { method: 'PATCH', uri: ITEM_URI },
     remove: { method: 'DELETE', uri: ITEM_URI },
     uid: 'id',
+    isResource: true,
+    onFailure: noop,
+    onSuccess: noop,
+    onRequest: noop,
   }
 
   delete actual.getUri

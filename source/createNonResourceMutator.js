@@ -17,7 +17,7 @@ export default function({ key }) {
     })
     .catch(({ response, request }) => {
       nonResource.onFailure({uri, method, headers, response})
-      this.handleResponse.call(this, {response, request})
+      // this.handleResponse.call(this, {response, request})
       return
     })
   }

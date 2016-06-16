@@ -184,4 +184,5 @@ export default {
   normalizeOperation,
   addNamesToResources,
   addQuery,
+  noop,
 }

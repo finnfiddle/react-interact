@@ -1,7 +1,8 @@
 import test from 'blue-tape'
 
 import agent from '../mock/agent'
-import { fetch, normalizeResource } from '../../source/utils'
+import { normalizeResource } from '../../source/utils'
+import fetch from '../../source/fetch'
 
 const BASE = '/test'
 const KEY = 'testResource'

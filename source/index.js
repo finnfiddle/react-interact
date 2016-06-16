@@ -27,6 +27,10 @@ let Interact = {
     return Object.assign({}, Interact.state)
   },
 
+  request(params) {
+    return DefaultAgent(params)
+  },
+
   createContainer(WrappedElement, resources, agent) {
     return stamp(React)
       .compose({
@@ -49,10 +53,12 @@ let Interact = {
         state: Object.assign({}, Interact.getState(), {_hasFetched: false}),
 
         componentDidMount() {
+          console.log('componentDidMount')
           this.fetch({props: this.props})
         },
 
         componentWillReceiveProps(nextProps) {
+          console.log('componentWillReceiveProps')
           this.fetch({props: nextProps})
         },
 
@@ -96,12 +102,17 @@ let Interact = {
 
           if (resource.isResource) {
             if (isFunction(request.callback)) {
-              let clonedResource = cloneDeep(this.state[resource.name])
-              request.callback(response, clonedResource, (updatedResource) => {
-                if (isSet(updatedResource)) {
-                  this.setState({[resource.name]: updatedResource})
-                }
-              })
+              try {
+                let clonedResource = cloneDeep(this.state[resource.name])
+                request.callback(response, clonedResource, (updatedResource) => {
+                  if (isSet(updatedResource)) {
+                    this.setState({[resource.name]: updatedResource})
+                  }
+                })
+              }
+              catch (error) {
+                console.log(error)
+              }
             }
             else {
               mergeResponse({
@@ -113,7 +124,12 @@ let Interact = {
             }
           }
           else if (isFunction(request.callback)) {
-            request.callback(response)
+            try {
+              request.callback(response)
+            }
+            catch (error) {
+              console.log(error)
+            }
           }
         },
 

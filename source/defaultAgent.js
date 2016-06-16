@@ -22,8 +22,7 @@ export default (request) => new Promise((resolve, reject) => {
     isSet(payload)
   ) req.send(payload)
 
-  req.end((err, response) => {
-    console.log({err, response})
+  req.end((error, response) => {
     if (!response.ok) reject({request, response})
     else resolve({request, response})
   })

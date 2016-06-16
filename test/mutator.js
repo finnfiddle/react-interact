@@ -1,7 +1,7 @@
 import test from 'blue-tape'
 
 import agent from './mock/agent'
-import { createMutator } from '../source/resourcesMutator'
+import createResourceMutator from '../source/createResourceMutator'
 import { normalizeResource } from '../source/utils'
 
 const BASE = '/test'
@@ -34,13 +34,14 @@ test('Mutator: CREATE', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources,
@@ -72,13 +73,14 @@ test('Mutator: UPDATE', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources,
@@ -110,13 +112,14 @@ test('Mutator: READ', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources,
@@ -148,13 +151,14 @@ test('Mutator: REMOVE', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources,
@@ -186,13 +190,14 @@ test('Mutator: LIST', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources,
@@ -235,13 +240,14 @@ test('Mutator: SUB CREATE', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources: {
@@ -286,13 +292,14 @@ test('Mutator: SUB UPDATE', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources: {
@@ -333,13 +340,14 @@ test('Mutator: FETCH multiple', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources: {
@@ -378,13 +386,14 @@ test('Mutator: FETCH single', t => {
         },
       },
     },
+    request: undefined,
   }
 
   const handleResponse = (actual) => {
     t.deepEqual(actual, expected)
   }
 
-  const mutator = createMutator.call(
+  const mutator = createResourceMutator.call(
     {
       agent,
       resources: {

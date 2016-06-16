@@ -1,6 +1,6 @@
 import test from 'blue-tape'
 
-import { mergeResponse } from '../../source/utils'
+import mergeResponse from '../source/mergeResponse'
 
 const CURRENT_DATA = [
   {id: 1, name: 'test1'},
